@@ -57,10 +57,10 @@ useEffect(() => {
   };
 
   return (
-  <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-    <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md">
+  <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8">
+    <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md">
 
-      <h1 className="text-2xl font-bold mb-6 text-center">
+      <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">
         Novo Agendamento
       </h1>
 
@@ -68,9 +68,9 @@ useEffect(() => {
 
         {/* Cliente */}
         <div>
-          <label className="text-sm text-gray-600">Cliente</label>
+          <label className="text-sm font-medium text-gray-700">Cliente</label>
           <select
-            className="w-full border rounded p-2 mt-1"
+            className="w-full border rounded-lg p-3 mt-1 focus:outline-none focus:ring-2 focus:ring-green-500"
             onChange={e => setForm({...form, cliente: e.target.value})}
           >
             <option>Selecione</option>
@@ -131,7 +131,7 @@ useEffect(() => {
               });
             }}
           >
-            <option>Selecione um horário</option>
+            <option value="">Selecione um horário</option>
 
             {horarios.map((h, i) => (
               <option key={i} value={h}>
@@ -143,7 +143,7 @@ useEffect(() => {
 
         {/* Botão */}
         <button
-          className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition"
+          className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition"
         >
           Salvar Agendamento
         </button>
