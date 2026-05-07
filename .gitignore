@@ -19,3 +19,15 @@ build/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Python
+venv/
+__pycache__/
+db.sqlite3
+
+# Node
+node_modules/
+dist/
+
+# Env
+.env
