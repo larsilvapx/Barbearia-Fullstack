@@ -17,6 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import path, include
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 def home(request):
     return JsonResponse({'Mensagem': 'Francis Farmer Barber will revenge on Seatle!'})
@@ -25,4 +29,10 @@ urlpatterns = [
     path('', home),
     path('admin/', admin.site.urls),
     path('api/', include('agendamento.urls')),
+    
+    # JWT LOGIN
+    path('api/token/', TokenObtainPairView.as_view()),
+
+    # REFRESH TOKEN
+    path('api/token/refresh/', TokenRefreshView.as_view()),
 ]

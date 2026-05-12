@@ -10,8 +10,7 @@ export default function App() {
       <div className="max-w-4xl mx-auto p-4">
         <Routes>
           <Route path="/" element={<Inicio />} />
-          <Route path="/dashboard" element={<Home />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Home />} />          
           <Route path="/novo" element={<NovoAgendamento />} />
           <Route path="/editar/:id" element={<EditarAgendamentos />}/> 
         </Routes>
