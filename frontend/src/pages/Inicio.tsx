@@ -21,7 +21,7 @@ export default function Inicio() {
           </h1>
 
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/login")}
             className="bg-gradient-to-r from-green-500 to-emerald-600 px-5 py-2 rounded-xl hover:scale-105 transition-all duration-300 shadow-2xl font-semibold"
           >
             Entrar
