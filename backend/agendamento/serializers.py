@@ -26,10 +26,36 @@ class ServicoSerializer(serializers.ModelSerializer):
     
 
 class AgendamentoSerializer(serializers.ModelSerializer):
-    cliente_nome = serializers.CharField(source='cliente.nome', read_only=True)
-    barbeiro_nome = serializers.CharField(source='barbeiro.nome', read_only=True)
-    servico_nome = serializers.CharField(source='servico.nome', read_only=True)
+
+    cliente_nome = serializers.CharField(
+        source='cliente.nome',
+        read_only=True
+    )
+
+    barbeiro_nome = serializers.CharField(
+        source='barbeiro.nome',
+        read_only=True
+    )
+
+    servico_nome = serializers.CharField(
+        source='servico.nome',
+        read_only=True
+    )
+
+    dataHora = serializers.DateTimeField(
+        source='data_hora'
+    )
 
     class Meta:
         model = Agendamento
-        fields = '__all__'
+        fields = [
+            'id',
+            'cliente_nome',
+            'barbeiro_nome',
+            'servico_nome',
+            'dataHora',
+            'criado_em',
+            'cliente',
+            'barbeiro',
+            'servico',
+        ]

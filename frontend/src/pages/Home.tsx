@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "../services/api";
 import type { Agendamento } from "../types";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,8 +12,15 @@ export default function Home() {
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // FILTROS
+  const [search, setSearch] = useState("");
+  const [filtro, setFiltro] = useState("todos");
+
+  // DELETE
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  // EDIT
   const [openEdit, setOpenEdit] = useState(false);
 
   const [editForm, setEditForm] = useState({
@@ -28,7 +35,7 @@ export default function Home() {
 
     api.get<Agendamento[]>("agendamentos/")
       .then(res => setAgendamentos(res.data))
-      .catch(err => console.log(err))
+      .catch(() => toast.error("Erro ao carregar agendamentos"))
       .finally(() => setLoading(false));
 
   }, []);
@@ -74,132 +81,53 @@ export default function Home() {
     }
   };
 
-  <Modal
-  open={openEdit}
-  onClose={() => setOpenEdit(false)}
->
-
-  <h2 className="text-2xl font-bold mb-6">
-    Editar Agendamento
-  </h2>
-
-  <div className="space-y-4">
-
-    <input
-      type="text"
-      value={editForm.cliente_nome}
-      onChange={(e) =>
-        setEditForm({
-          ...editForm,
-          cliente_nome: e.target.value
-        })
-      }
-      className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
-      placeholder="Cliente"
-    />
-
-    <input
-      type="text"
-      value={editForm.barbeiro_nome}
-      onChange={(e) =>
-        setEditForm({
-          ...editForm,
-          barbeiro_nome: e.target.value
-        })
-      }
-      className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
-      placeholder="Barbeiro"
-    />
-
-    <input
-      type="text"
-      value={editForm.servico_nome}
-      onChange={(e) =>
-        setEditForm({
-          ...editForm,
-          servico_nome: e.target.value
-        })
-      }
-      className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
-      placeholder="Serviço"
-    />
-
-    <input
-      type="datetime-local"
-      value={editForm.dataHora}
-      onChange={(e) =>
-        setEditForm({
-          ...editForm,
-          dataHora: e.target.value
-        })
-      }
-      className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
-    />
-
-  </div>
-
-  <div className="flex justify-end gap-4 mt-8">
-
-    <button
-      onClick={() => setOpenEdit(false)}
-      className="bg-white/10 hover:bg-white/20 px-5 py-2 rounded-xl"
-    >
-      Cancelar
-    </button>
-
-    <button
-      onClick={handleUpdate}
-      className="bg-green-500 hover:bg-green-600 px-5 py-2 rounded-xl"
-    >
-      Salvar
-    </button>
-
-  </div>
-
-</Modal>
-
+  // EDITAR
   const openEditModal = (a: Agendamento) => {
 
-  setEditForm({
-    id: a.id,
-    cliente_nome: a.cliente_nome,
-    barbeiro_nome: a.barbeiro_nome,
-    servico_nome: a.servico_nome,
-    dataHora: a.dataHora
-  });
+    setEditForm({
+      id: a.id,
+      cliente_nome: a.cliente_nome,
+      barbeiro_nome: a.barbeiro_nome,
+      servico_nome: a.servico_nome,
+      dataHora: a.dataHora
+        ? a.dataHora.slice(0, 16)
+        : ""
+    });
 
-  setOpenEdit(true);
-};
+    setOpenEdit(true);
+  };
 
-const handleUpdate = async () => {
+  const handleUpdate = async () => {
 
-  try {
+    try {
 
-    await api.put(
-      `agendamentos/${editForm.id}/`,
-      editForm
-    );
+      const response = await api.put(
+        `agendamentos/${editForm.id}/`,
+        editForm
+      );
 
-    setAgendamentos(prev =>
-      prev.map(a =>
-        a.id === editForm.id
-          ? editForm
-          : a
-      )
-    );
+      setAgendamentos(prev =>
+        prev.map(a =>
+          a.id === editForm.id
+            ? response.data
+            : a
+        )
+      );
 
-    toast.success("Agendamento atualizado!");
+      toast.success("Agendamento atualizado!");
 
-    setOpenEdit(false);
+      setOpenEdit(false);
 
-  } catch {
+    } catch {
 
-    toast.error("Erro ao atualizar!");
-  }
-};
+      toast.error("Erro ao atualizar!");
+    }
+  };
 
-  // FILTROS
+  // ESTATÍSTICAS
   const agendamentosHoje = agendamentos.filter(a => {
+
+    if (!a.dataHora) return false;
 
     const hoje = new Date().toDateString();
 
@@ -208,8 +136,46 @@ const handleUpdate = async () => {
   });
 
   const proximos = agendamentos.filter(a =>
+    a.dataHora &&
     new Date(a.dataHora) > new Date()
   );
+
+  // FILTRAGEM DINÂMICA
+  const agendamentosFiltrados = useMemo(() => {
+
+    return agendamentos.filter(a => {
+
+      const texto = search.toLowerCase();
+
+      const matchSearch =
+        a.cliente_nome.toLowerCase().includes(texto) ||
+        a.barbeiro_nome.toLowerCase().includes(texto) ||
+        a.servico_nome.toLowerCase().includes(texto);
+
+      if (filtro === "hoje") {
+
+        return (
+          matchSearch &&
+          a.dataHora &&
+          new Date(a.dataHora).toDateString() ===
+            new Date().toDateString()
+        );
+      }
+
+      if (filtro === "proximos") {
+
+        return (
+          matchSearch &&
+          a.dataHora &&
+          new Date(a.dataHora) > new Date()
+        );
+      }
+
+      return matchSearch;
+
+    });
+
+  }, [agendamentos, search, filtro]);
 
   return (
     <>
@@ -227,23 +193,33 @@ const handleUpdate = async () => {
 
             <nav className="space-y-3">
 
+            <Link to="/dashBoard">
+
               <button className="w-full bg-green-500/20 border border-green-500/20 text-green-400 p-3 rounded-xl text-left">
-                📊 Dashboard
+               📊 Dashboard
               </button>
 
+            </Link>
+
+            <Link to="/dashBoard">
               <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
                 📅 Agendamentos
               </button>
+            </Link>
 
+            <Link to="/clientes">
               <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
                 👥 Clientes
               </button>
+            </Link>
 
+            <Link to="/servicos">
               <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
                 ✂️ Serviços
               </button>
+            </Link>
 
-            </nav>
+        </nav>
 
           </div>
 
@@ -325,16 +301,43 @@ const handleUpdate = async () => {
 
           </div>
 
+          {/* FILTROS */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+
+            <input
+              type="text"
+              placeholder="Buscar cliente, barbeiro ou serviço..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-1 bg-white/5 border border-white/10 rounded-2xl p-4 outline-none focus:border-green-500"
+            />
+
+            <select
+              value={filtro}
+              onChange={(e) => setFiltro(e.target.value)}
+              className="bg-white/5 border border-white/10 rounded-2xl p-4 outline-none"
+            >
+              <option value="todos" className="text-black">
+                Todos
+              </option>
+
+              <option value="hoje" className="text-black">
+                Hoje
+              </option>
+
+              <option value="proximos" className="text-black">
+                Próximos
+              </option>
+            </select>
+
+          </div>
+
           {/* LISTA */}
           <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-xl">
 
-            <div className="flex justify-between items-center mb-6">
-
-              <h3 className="text-2xl font-bold">
-                Agendamentos
-              </h3>
-
-            </div>
+            <h3 className="text-2xl font-bold mb-6">
+              Agendamentos
+            </h3>
 
             {/* LOADING */}
             {loading && (
@@ -348,7 +351,7 @@ const handleUpdate = async () => {
             )}
 
             {/* VAZIO */}
-            {!loading && agendamentos.length === 0 && (
+            {!loading && agendamentosFiltrados.length === 0 && (
 
               <div className="text-center text-gray-400 py-10">
                 Nenhum agendamento encontrado
@@ -359,7 +362,7 @@ const handleUpdate = async () => {
             {/* ITENS */}
             <div className="space-y-4">
 
-              {agendamentos.map(a => (
+              {agendamentosFiltrados.map(a => (
 
                 <div
                   key={a.id}
@@ -387,14 +390,18 @@ const handleUpdate = async () => {
                     <div className="text-right">
 
                       <p className="text-gray-400">
-                        {new Date(a.dataHora).toLocaleDateString()}
+                        {a.dataHora
+                          ? new Date(a.dataHora).toLocaleDateString("pt-BR")
+                          : "Data inválida"}
                       </p>
 
                       <p className="text-green-400 font-bold text-lg">
-                        {new Date(a.dataHora).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit"
-                        })}
+                        {a.dataHora
+                          ? new Date(a.dataHora).toLocaleTimeString("pt-BR", {
+                              hour: "2-digit",
+                              minute: "2-digit"
+                            })
+                          : "Horário inválido"}
                       </p>
 
                     </div>
@@ -405,7 +412,7 @@ const handleUpdate = async () => {
                   <div className="flex justify-end gap-3 mt-5">
 
                     <button
-                      onClick={() => navigate(`/editar/${a.id}`)}
+                      onClick={() => openEditModal(a)}
                       className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-4 py-2 rounded-xl transition"
                     >
                       Editar
@@ -460,6 +467,91 @@ const handleUpdate = async () => {
             className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl transition"
           >
             Excluir
+          </button>
+
+        </div>
+
+      </Modal>
+
+      {/* MODAL EDIT */}
+      <Modal
+        open={openEdit}
+        onClose={() => setOpenEdit(false)}
+      >
+
+        <h2 className="text-2xl font-bold mb-6">
+          Editar Agendamento
+        </h2>
+
+        <div className="space-y-4">
+
+          <input
+            type="text"
+            value={editForm.cliente_nome}
+            onChange={(e) =>
+              setEditForm({
+                ...editForm,
+                cliente_nome: e.target.value
+              })
+            }
+            className="w-full bg-black/30 border border-white/10 rounded-xl p-3 text-white"
+            placeholder="Cliente"
+          />
+
+          <input
+            type="text"
+            value={editForm.barbeiro_nome}
+            onChange={(e) =>
+              setEditForm({
+                ...editForm,
+                barbeiro_nome: e.target.value
+              })
+            }
+            className="w-full bg-black/30 border border-white/10 rounded-xl p-3 text-white"
+            placeholder="Barbeiro"
+          />
+
+          <input
+            type="text"
+            value={editForm.servico_nome}
+            onChange={(e) =>
+              setEditForm({
+                ...editForm,
+                servico_nome: e.target.value
+              })
+            }
+            className="w-full bg-black/30 border border-white/10 rounded-xl p-3 text-white"
+            placeholder="Serviço"
+          />
+
+          <input
+            type="datetime-local"
+            value={editForm.dataHora}
+            onChange={(e) =>
+              setEditForm({
+                ...editForm,
+                dataHora: e.target.value
+              })
+            }
+            className="w-full bg-black/30 border border-white/10 rounded-xl p-3 text-white"
+          />
+
+        </div>
+
+        <div className="flex justify-end gap-4 mt-8">
+
+          <button
+            onClick={() => setOpenEdit(false)}
+            className="bg-white/10 hover:bg-white/20 px-5 py-2 rounded-xl transition"
+          >
+            Cancelar
+          </button>
+
+          <button
+            onClick={handleUpdate}
+            className="bg-green-500 hover:bg-green-600 px-5 py-2 rounded-xl transition"
+          >
+            Salvar
           </button>
 
         </div>

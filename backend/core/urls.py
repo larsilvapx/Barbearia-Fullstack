@@ -35,4 +35,6 @@ urlpatterns = [
 
     # REFRESH TOKEN
     path('api/token/refresh/', TokenRefreshView.as_view()),
+
+    
 ]
