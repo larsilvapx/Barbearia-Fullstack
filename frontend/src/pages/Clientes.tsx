@@ -7,6 +7,7 @@ type Cliente = {
   id: number;
   nome: string;
   telefone: string;
+  email: string;
 };
 
 export default function Clientes() {
@@ -15,6 +16,7 @@ export default function Clientes() {
 
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [email, setEmail] = useState("");
 
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +30,8 @@ export default function Clientes() {
   const [editForm, setEditForm] = useState({
     id: 0,
     nome: "",
-    telefone: ""
+    telefone: "",
+    email: ""
   });
 
   // CARREGAR CLIENTES
@@ -40,8 +43,9 @@ export default function Clientes() {
 
       setClientes(response.data);
 
-    } catch(error) {
-        console.log(error);
+    } catch (error) {
+
+      console.log(error);
 
       toast.error("Erro ao carregar clientes");
 
@@ -61,7 +65,7 @@ export default function Clientes() {
   // CADASTRAR
   const handleCreate = async () => {
 
-    if (!nome || !telefone) {
+    if (!nome || !telefone || !email) {
 
       toast.error("Preencha todos os campos");
 
@@ -72,17 +76,21 @@ export default function Clientes() {
 
       const response = await api.post("clientes/", {
         nome,
-        telefone
+        telefone,
+        email
       });
 
       setClientes(prev => [...prev, response.data]);
 
       setNome("");
       setTelefone("");
+      setEmail("");
 
       toast.success("Cliente cadastrado!");
 
-    } catch {
+    } catch (error) {
+
+      console.log(error);
 
       toast.error("Erro ao cadastrar cliente");
     }
@@ -147,7 +155,9 @@ export default function Clientes() {
 
       setOpenEdit(false);
 
-    } catch {
+    } catch (error) {
+
+      console.log(error);
 
       toast.error("Erro ao atualizar cliente");
     }
@@ -180,13 +190,20 @@ export default function Clientes() {
           Novo Cliente
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-4 gap-4">
 
           <input
             type="text"
             placeholder="Nome"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
+            className="bg-black/30 border border-white/10 rounded-xl p-3"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="bg-black/30 border border-white/10 rounded-xl p-3"
           />
 
@@ -197,6 +214,8 @@ export default function Clientes() {
             onChange={(e) => setTelefone(e.target.value)}
             className="bg-black/30 border border-white/10 rounded-xl p-3"
           />
+
+          
 
           <button
             onClick={handleCreate}
@@ -241,6 +260,10 @@ export default function Clientes() {
 
                 <p className="text-gray-400">
                   {cliente.telefone}
+                </p>
+
+                <p className="text-gray-500 text-sm">
+                  {cliente.email}
                 </p>
 
               </div>
@@ -336,6 +359,18 @@ export default function Clientes() {
               setEditForm({
                 ...editForm,
                 telefone: e.target.value
+              })
+            }
+            className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
+          />
+
+          <input
+            type="email"
+            value={editForm.email}
+            onChange={(e) =>
+              setEditForm({
+                ...editForm,
+                email: e.target.value
               })
             }
             className="w-full bg-black/30 border border-white/10 rounded-xl p-3"

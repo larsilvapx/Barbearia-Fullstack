@@ -5,6 +5,19 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Modal from "../components/Modal";
 
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell
+} from "recharts";
+
 export default function Home() {
 
   const navigate = useNavigate();
@@ -31,6 +44,7 @@ export default function Home() {
     dataHora: ""
   });
 
+  // CARREGAR AGENDAMENTOS
   useEffect(() => {
 
     api.get<Agendamento[]>("agendamentos/")
@@ -54,8 +68,8 @@ export default function Home() {
   const openDeleteModal = (id: number) => {
 
     setSelectedId(id);
-    setOpenDelete(true);
 
+    setOpenDelete(true);
   };
 
   const handleDelete = async () => {
@@ -77,7 +91,6 @@ export default function Home() {
     } catch {
 
       toast.error("Erro ao excluir!");
-
     }
   };
 
@@ -140,40 +153,78 @@ export default function Home() {
     new Date(a.dataHora) > new Date()
   );
 
+  // FATURAMENTO TOTAL
+  const faturamentoTotal = agendamentos.reduce(
+    (acc, item) =>
+      acc + Number(item.servico_preco || 0),
+    0
+  );
+
+  // GRÁFICO DE FATURAMENTO
+  const faturamentoPorServico = agendamentos.reduce((acc, item) => {
+
+    const existente = acc.find(
+      s => s.nome === item.servico_nome
+    );
+
+    if (existente) {
+
+      existente.valor += Number(item.servico_preco || 0);
+
+    } else {
+
+      acc.push({
+        nome: item.servico_nome,
+        valor: Number(item.servico_preco || 0)
+      });
+    }
+
+    return acc;
+
+  }, [] as { nome: string; valor: number }[]);
+
   // FILTRAGEM DINÂMICA
   const agendamentosFiltrados = useMemo(() => {
 
-    return agendamentos.filter(a => {
+    return agendamentos
 
-      const texto = search.toLowerCase();
+      .filter(a => {
 
-      const matchSearch =
-        a.cliente_nome.toLowerCase().includes(texto) ||
-        a.barbeiro_nome.toLowerCase().includes(texto) ||
-        a.servico_nome.toLowerCase().includes(texto);
+        const texto = search.toLowerCase();
 
-      if (filtro === "hoje") {
+        const matchSearch =
+          a.cliente_nome.toLowerCase().includes(texto) ||
+          a.barbeiro_nome.toLowerCase().includes(texto) ||
+          a.servico_nome.toLowerCase().includes(texto);
 
-        return (
-          matchSearch &&
-          a.dataHora &&
-          new Date(a.dataHora).toDateString() ===
-            new Date().toDateString()
-        );
-      }
+        if (filtro === "hoje") {
 
-      if (filtro === "proximos") {
+          return (
+            matchSearch &&
+            a.dataHora &&
+            new Date(a.dataHora).toDateString() ===
+              new Date().toDateString()
+          );
+        }
 
-        return (
-          matchSearch &&
-          a.dataHora &&
-          new Date(a.dataHora) > new Date()
-        );
-      }
+        if (filtro === "proximos") {
 
-      return matchSearch;
+          return (
+            matchSearch &&
+            a.dataHora &&
+            new Date(a.dataHora) > new Date()
+          );
+        }
 
-    });
+        return matchSearch;
+
+      })
+
+      .sort(
+        (a, b) =>
+          new Date(a.dataHora).getTime() -
+          new Date(b.dataHora).getTime()
+      );
 
   }, [agendamentos, search, filtro]);
 
@@ -193,33 +244,47 @@ export default function Home() {
 
             <nav className="space-y-3">
 
-            <Link to="/dashBoard">
+              <Link to="/dashboard">
 
-              <button className="w-full bg-green-500/20 border border-green-500/20 text-green-400 p-3 rounded-xl text-left">
-               📊 Dashboard
-              </button>
+                <button className="w-full bg-green-500/20 border border-green-500/20 text-green-400 p-3 rounded-xl text-left">
+                  📊 Dashboard
+                </button>
 
-            </Link>
+              </Link>
 
-            <Link to="/dashBoard">
-              <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
-                📅 Agendamentos
-              </button>
-            </Link>
+              <Link to="/calendario">
 
-            <Link to="/clientes">
-              <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
-                👥 Clientes
-              </button>
-            </Link>
+                <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
+                  📅 Calendário
+                </button>
 
-            <Link to="/servicos">
-              <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
-                ✂️ Serviços
-              </button>
-            </Link>
+              </Link>
 
-        </nav>
+              <Link to="/barbeiros">
+
+                <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
+                  👨‍💼 Barbeiros
+                </button>
+
+              </Link>
+
+              <Link to="/clientes">
+
+                <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
+                  👥 Clientes
+                </button>
+
+              </Link>
+
+              <Link to="/servicos">
+
+                <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
+                  ✂️ Serviços
+                </button>
+
+              </Link>
+
+            </nav>
 
           </div>
 
@@ -261,7 +326,7 @@ export default function Home() {
           </div>
 
           {/* CARDS */}
-          <div className="grid md:grid-cols-3 gap-6 mb-10">
+          <div className="grid md:grid-cols-4 gap-6 mb-10">
 
             <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-xl">
 
@@ -299,6 +364,18 @@ export default function Home() {
 
             </div>
 
+            <div className="bg-yellow-500/10 border border-yellow-500/20 p-6 rounded-3xl backdrop-blur-xl">
+
+              <p className="text-yellow-300 mb-2">
+                Faturamento
+              </p>
+
+              <h3 className="text-4xl font-extrabold text-yellow-400">
+                R$ {faturamentoTotal.toFixed(2)}
+              </h3>
+
+            </div>
+
           </div>
 
           {/* FILTROS */}
@@ -306,7 +383,7 @@ export default function Home() {
 
             <input
               type="text"
-              placeholder="Buscar cliente, barbeiro ou serviço..."
+              placeholder="🔍 Buscar cliente, barbeiro ou serviço..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 bg-white/5 border border-white/10 rounded-2xl p-4 outline-none focus:border-green-500"
@@ -317,6 +394,7 @@ export default function Home() {
               onChange={(e) => setFiltro(e.target.value)}
               className="bg-white/5 border border-white/10 rounded-2xl p-4 outline-none"
             >
+
               <option value="todos" className="text-black">
                 Todos
               </option>
@@ -328,7 +406,92 @@ export default function Home() {
               <option value="proximos" className="text-black">
                 Próximos
               </option>
+
             </select>
+
+          </div>
+
+          {/* GRÁFICOS */}
+          <div className="grid lg:grid-cols-2 gap-6 mt-10 mb-10">
+
+            {/* BAR CHART */}
+            <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+
+              <h2 className="text-2xl font-bold mb-6">
+                Faturamento por Serviço
+              </h2>
+
+              <div className="h-[350px]">
+
+                <ResponsiveContainer width="100%" height="100%">
+
+                  <BarChart data={faturamentoPorServico}>
+
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#333"
+                    />
+
+                    <XAxis
+                      dataKey="nome"
+                      stroke="#999"
+                    />
+
+                    <YAxis stroke="#999" />
+
+                    <Tooltip />
+
+                    <Bar
+                      dataKey="valor"
+                      radius={[10, 10, 0, 0]}
+                    />
+
+                  </BarChart>
+
+                </ResponsiveContainer>
+
+              </div>
+
+            </div>
+
+            {/* PIE CHART */}
+            <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+
+              <h2 className="text-2xl font-bold mb-6">
+                Serviços Mais Vendidos
+              </h2>
+
+              <div className="h-[350px]">
+
+                <ResponsiveContainer width="100%" height="100%">
+
+                  <PieChart>
+
+                    <Pie
+                      data={faturamentoPorServico}
+                      dataKey="valor"
+                      nameKey="nome"
+                      outerRadius={120}
+                      label
+                    >
+
+                      {faturamentoPorServico.map((_, index) => (
+
+                        <Cell key={index} />
+
+                      ))}
+
+                    </Pie>
+
+                    <Tooltip />
+
+                  </PieChart>
+
+                </ResponsiveContainer>
+
+              </div>
+
+            </div>
 
           </div>
 
@@ -366,7 +529,7 @@ export default function Home() {
 
                 <div
                   key={a.id}
-                  className="bg-black/30 border border-white/5 rounded-2xl p-5 hover:border-green-500/30 transition-all duration-300"
+                  className="bg-black/30 border border-white/5 rounded-2xl p-5 hover:border-green-500/40 hover:scale-[1.01] transition-all duration-300"
                 >
 
                   <div className="flex justify-between items-center">

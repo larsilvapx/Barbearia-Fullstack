@@ -3,20 +3,16 @@ import { api } from "../services/api";
 import toast from "react-hot-toast";
 import Modal from "../components/Modal";
 
-type Servico = {
+type Barbeiro = {
   id: number;
   nome: string;
-  duracao: number;
-  preco: number;
 };
 
-export default function Servicos() {
+export default function Barbeiros() {
 
-  const [servicos, setServicos] = useState<Servico[]>([]);
+  const [barbeiros, setBarbeiros] = useState<Barbeiro[]>([]);
 
   const [nome, setNome] = useState("");
-  const [duracao, setDuracao] = useState("");
-  const [preco, setPreco] = useState("");
 
   const [loading, setLoading] = useState(true);
 
@@ -29,68 +25,59 @@ export default function Servicos() {
 
   const [editForm, setEditForm] = useState({
     id: 0,
-    nome: "",
-    duracao: 0,
-    preco: 0
+    nome: ""
   });
 
   // CARREGAR
-  const carregarServicos = async () => {
+  const carregarBarbeiros = async () => {
 
     try {
 
-      const response = await api.get("servicos/");
+      const response = await api.get("barbeiros/");
 
-      setServicos(response.data);
+      setBarbeiros(response.data);
 
     } catch {
 
-      toast.error("Erro ao carregar serviços");
+      toast.error("Erro ao carregar barbeiros");
 
     } finally {
 
       setLoading(false);
-
     }
   };
 
   useEffect(() => {
 
-    carregarServicos();
+    carregarBarbeiros();
 
   }, []);
 
-  // CADASTRAR
+  // CREATE
   const handleCreate = async () => {
 
-    if (!nome || !duracao || !preco) {
+    if (!nome) {
 
-      toast.error("Preencha todos os campos");
+      toast.error("Digite o nome");
 
       return;
     }
 
     try {
 
-      const response = await api.post("servicos/", {
-        nome,
-        duracao: Number(duracao),
-        preco: Number(preco)
+      const response = await api.post("barbeiros/", {
+        nome
       });
 
-      setServicos(prev => [...prev, response.data]);
+      setBarbeiros(prev => [...prev, response.data]);
 
       setNome("");
-      setDuracao("");
-      setPreco("");
 
-      toast.success("Serviço cadastrado!");
+      toast.success("Barbeiro cadastrado!");
 
-    } catch (error) {
+    } catch {
 
-      console.log(error);
-
-      toast.error("Erro ao cadastrar serviço");
+      toast.error("Erro ao cadastrar");
     }
   };
 
@@ -108,26 +95,26 @@ export default function Servicos() {
 
     try {
 
-      await api.delete(`servicos/${selectedId}/`);
+      await api.delete(`barbeiros/${selectedId}/`);
 
-      setServicos(prev =>
-        prev.filter(s => s.id !== selectedId)
+      setBarbeiros(prev =>
+        prev.filter(b => b.id !== selectedId)
       );
 
-      toast.success("Serviço excluído!");
+      toast.success("Barbeiro excluído!");
 
       setOpenDelete(false);
 
     } catch {
 
-      toast.error("Erro ao excluir serviço");
+      toast.error("Erro ao excluir");
     }
   };
 
-  // EDITAR
-  const openEditModal = (servico: Servico) => {
+  // EDIT
+  const openEditModal = (barbeiro: Barbeiro) => {
 
-    setEditForm(servico);
+    setEditForm(barbeiro);
 
     setOpenEdit(true);
   };
@@ -137,25 +124,25 @@ export default function Servicos() {
     try {
 
       const response = await api.put(
-        `servicos/${editForm.id}/`,
+        `barbeiros/${editForm.id}/`,
         editForm
       );
 
-      setServicos(prev =>
-        prev.map(s =>
-          s.id === editForm.id
+      setBarbeiros(prev =>
+        prev.map(b =>
+          b.id === editForm.id
             ? response.data
-            : s
+            : b
         )
       );
 
-      toast.success("Serviço atualizado!");
+      toast.success("Barbeiro atualizado!");
 
       setOpenEdit(false);
 
     } catch {
 
-      toast.error("Erro ao atualizar serviço");
+      toast.error("Erro ao atualizar");
     }
   };
 
@@ -163,14 +150,15 @@ export default function Servicos() {
 
     <div className="min-h-screen bg-[#020617] text-white p-8">
 
+      {/* HEADER */}
       <div className="mb-10">
 
         <h1 className="text-4xl font-bold">
-          Serviços
+          Barbeiros
         </h1>
 
         <p className="text-gray-400">
-          Gerencie os serviços da barbearia
+          Gerencie os profissionais da barbearia
         </p>
 
       </div>
@@ -179,39 +167,22 @@ export default function Servicos() {
       <div className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-10">
 
         <h2 className="text-2xl font-bold mb-6">
-          Novo Serviço
+          Novo Barbeiro
         </h2>
 
-        <div className="grid md:grid-cols-4 gap-4">
+        <div className="flex gap-4">
 
           <input
             type="text"
-            placeholder="Nome do serviço"
+            placeholder="Nome do barbeiro"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            className="bg-black/30 border border-white/10 rounded-xl p-3"
-          />
-
-          <input
-            type="number"
-            placeholder="Duração (min)"
-            value={duracao}
-            onChange={(e) => setDuracao(e.target.value)}
-            className="bg-black/30 border border-white/10 rounded-xl p-3"
-          />
-
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Preço"
-            value={preco}
-            onChange={(e) => setPreco(e.target.value)}
-            className="bg-black/30 border border-white/10 rounded-xl p-3"
+            className="flex-1 bg-black/30 border border-white/10 rounded-xl p-3"
           />
 
           <button
             onClick={handleCreate}
-            className="bg-green-500 hover:bg-green-600 rounded-xl font-semibold"
+            className="bg-green-500 hover:bg-green-600 px-6 rounded-xl font-semibold"
           >
             Cadastrar
           </button>
@@ -224,7 +195,7 @@ export default function Servicos() {
       <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
 
         <h2 className="text-2xl font-bold mb-6">
-          Lista de Serviços
+          Lista de Barbeiros
         </h2>
 
         {loading && (
@@ -237,40 +208,28 @@ export default function Servicos() {
 
         <div className="space-y-4">
 
-          {servicos.map(servico => (
+          {barbeiros.map(barbeiro => (
 
             <div
-              key={servico.id}
+              key={barbeiro.id}
               className="bg-black/30 border border-white/5 rounded-2xl p-5 flex justify-between items-center"
             >
 
-              <div>
-
-                <h3 className="text-xl font-bold">
-                  {servico.nome}
-                </h3>
-
-                <p className="text-gray-400">
-                  ⏱ {servico.duracao} min
-                </p>
-
-                <p className="text-green-400 font-bold">
-                  R$ {Number(servico.preco).toFixed(2)}
-                </p>
-
-              </div>
+              <h3 className="text-xl font-bold">
+                {barbeiro.nome}
+              </h3>
 
               <div className="flex gap-3">
 
                 <button
-                  onClick={() => openEditModal(servico)}
+                  onClick={() => openEditModal(barbeiro)}
                   className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-4 py-2 rounded-xl"
                 >
                   Editar
                 </button>
 
                 <button
-                  onClick={() => openDeleteModal(servico.id)}
+                  onClick={() => openDeleteModal(barbeiro.id)}
                   className="bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-xl"
                 >
                   Excluir
@@ -293,7 +252,7 @@ export default function Servicos() {
       >
 
         <h2 className="text-2xl font-bold mb-4">
-          Excluir Serviço
+          Excluir barbeiro
         </h2>
 
         <p className="text-gray-400 mb-6">
@@ -327,49 +286,20 @@ export default function Servicos() {
       >
 
         <h2 className="text-2xl font-bold mb-6">
-          Editar Serviço
+          Editar Barbeiro
         </h2>
 
-        <div className="space-y-4">
-
-          <input
-            type="text"
-            value={editForm.nome}
-            onChange={(e) =>
-              setEditForm({
-                ...editForm,
-                nome: e.target.value
-              })
-            }
-            className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
-          />
-
-          <input
-            type="number"
-            value={editForm.duracao}
-            onChange={(e) =>
-              setEditForm({
-                ...editForm,
-                duracao: Number(e.target.value)
-              })
-            }
-            className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
-          />
-
-          <input
-            type="number"
-            step="0.01"
-            value={editForm.preco}
-            onChange={(e) =>
-              setEditForm({
-                ...editForm,
-                preco: Number(e.target.value)
-              })
-            }
-            className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
-          />
-
-        </div>
+        <input
+          type="text"
+          value={editForm.nome}
+          onChange={(e) =>
+            setEditForm({
+              ...editForm,
+              nome: e.target.value
+            })
+          }
+          className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
+        />
 
         <div className="flex justify-end gap-4 mt-8">
 

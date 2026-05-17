@@ -10,6 +10,8 @@ import PrivateRoute from "./pages/PrivateRoute";
 
 import Clientes from "./pages/Clientes";
 import Servicos from "./pages/Servicos";
+import Barbeiros from "./pages/Barbeiros";
+import Calendario from "./pages/Calendario";
 
 export default function App() {
 
@@ -32,6 +34,15 @@ export default function App() {
           />
 
           <Route
+            path="/calendario"
+            element={
+              <PrivateRoute>
+                <Calendario />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
             path="/dashboard"
             element={
               <PrivateRoute>
@@ -39,6 +50,12 @@ export default function App() {
               </PrivateRoute>
             }
           />
+
+          <Route
+           path="/barbeiros" element={<Barbeiros />
+
+           }
+            />
 
           <Route
             path="/clientes"

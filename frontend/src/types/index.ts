@@ -23,4 +23,6 @@ export interface Agendamento{
     cliente_nome: string;
     barbeiro_nome: string;
     servico_nome: string;
+
+    servico_preco: number;
 }
