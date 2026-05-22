@@ -155,15 +155,34 @@ export default function Home() {
 
   // FATURAMENTO TOTAL
   const faturamentoTotal = agendamentos.reduce(
-    (acc, item) =>
-      acc + Number(item.servico_preco || 0),
+    (total, item) =>
+      total + Number(item.servico_preco || 0),
     0
   );
+
+  // TOTAL COMISSÕES
+  const totalComissoes = agendamentos.reduce(
+  (total, item) => {
+
+    const preco = Number(item.servico_preco || 0);
+
+    const percentual =
+      Number(item.barbeiro_comissao || 0);
+
+    return total + (preco * percentual) / 100;
+
+  },
+  0
+);
+
+// LUCRO BARBEARIA
+  const lucroBarbearia =
+      faturamentoTotal - totalComissoes;
 
   // GRÁFICO DE FATURAMENTO
   const faturamentoPorServico = agendamentos.reduce((acc, item) => {
 
-    const existente = acc.find(
+  const existente = acc.find(
       s => s.nome === item.servico_nome
     );
 
@@ -375,6 +394,18 @@ export default function Home() {
               </h3>
 
             </div>
+
+          </div>
+
+          <div className="bg-pink-500/10 border border-pink-500/20 p-6 rounded-3xl backdrop-blur-xl">
+
+            <p className="text-pink-300 mb-2">
+              Lucro
+            </p>
+
+            <h3 className="text-4xl font-extrabold text-pink-400">
+              R$ {lucroBarbearia.toFixed(2)}
+            </h3>
 
           </div>
 

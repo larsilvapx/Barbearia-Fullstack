@@ -13,6 +13,14 @@ class Cliente(models.Model):
 class Barbeiro(models.Model):
     nome = models.CharField(max_length=100)
 
+    percentual_comissao = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=40,
+        verbose_name="Percentual de Comissão"
+           
+    )
+
     def __str__(self):
         return self.nome
     

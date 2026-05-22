@@ -22,10 +22,21 @@ class ServicoSerializer(serializers.ModelSerializer):
 
 class AgendamentoSerializer(serializers.ModelSerializer):
 
-    cliente_nome = serializers.CharField(source="cliente.nome", read_only=True)
-    barbeiro_nome = serializers.CharField(source="barbeiro.nome", read_only=True)
+    cliente_nome = serializers.CharField(
+        source="cliente.nome",
+        read_only=True
+    )
 
-    servico_nome = serializers.CharField(source="servico.nome", read_only=True)
+    barbeiro_nome = serializers.CharField(
+        source="barbeiro.nome",
+        read_only=True
+    )
+
+    servico_nome = serializers.CharField(
+        source="servico.nome",
+        read_only=True
+    )
+
     servico_preco = serializers.DecimalField(
         source="servico.preco",
         max_digits=6,
@@ -33,18 +44,30 @@ class AgendamentoSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
-    dataHora = serializers.DateTimeField(source="data_hora")
+    barbeiro_comissao = serializers.IntegerField(
+        source="barbeiro.percentual_comissao",
+        read_only=True
+    )
+
+    dataHora = serializers.DateTimeField(
+        source="data_hora"
+    )
 
     class Meta:
         model = Agendamento
+
         fields = [
             "id",
             "cliente",
             "barbeiro",
             "servico",
+
             "cliente_nome",
             "barbeiro_nome",
             "servico_nome",
+
             "servico_preco",
+            "barbeiro_comissao",
+
             "dataHora",
         ]

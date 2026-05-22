@@ -6,6 +6,7 @@ import Modal from "../components/Modal";
 type Barbeiro = {
   id: number;
   nome: string;
+  percentual_comissao: number;
 };
 
 export default function Barbeiros() {
@@ -13,6 +14,7 @@ export default function Barbeiros() {
   const [barbeiros, setBarbeiros] = useState<Barbeiro[]>([]);
 
   const [nome, setNome] = useState("");
+  const [percentualComissao, setPercentualComissao] = useState(40);
 
   const [loading, setLoading] = useState(true);
 
@@ -25,7 +27,8 @@ export default function Barbeiros() {
 
   const [editForm, setEditForm] = useState({
     id: 0,
-    nome: ""
+    nome: "",
+    percentual_comissao: 40
   });
 
   // CARREGAR
@@ -66,12 +69,14 @@ export default function Barbeiros() {
     try {
 
       const response = await api.post("barbeiros/", {
-        nome
+        nome,
+        percentual_comissao: percentualComissao
       });
 
       setBarbeiros(prev => [...prev, response.data]);
 
       setNome("");
+      setPercentualComissao(40);
 
       toast.success("Barbeiro cadastrado!");
 
@@ -170,19 +175,29 @@ export default function Barbeiros() {
           Novo Barbeiro
         </h2>
 
-        <div className="flex gap-4">
+        <div className="grid md:grid-cols-3 gap-4">
 
           <input
             type="text"
             placeholder="Nome do barbeiro"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            className="flex-1 bg-black/30 border border-white/10 rounded-xl p-3"
+            className="bg-black/30 border border-white/10 rounded-xl p-3"
+          />
+
+          <input
+            type="number"
+            placeholder="Comissão %"
+            value={percentualComissao}
+            onChange={(e) =>
+              setPercentualComissao(Number(e.target.value))
+            }
+            className="bg-black/30 border border-white/10 rounded-xl p-3"
           />
 
           <button
             onClick={handleCreate}
-            className="bg-green-500 hover:bg-green-600 px-6 rounded-xl font-semibold"
+            className="bg-green-500 hover:bg-green-600 rounded-xl font-semibold"
           >
             Cadastrar
           </button>
@@ -215,9 +230,17 @@ export default function Barbeiros() {
               className="bg-black/30 border border-white/5 rounded-2xl p-5 flex justify-between items-center"
             >
 
-              <h3 className="text-xl font-bold">
-                {barbeiro.nome}
-              </h3>
+              <div>
+
+                <h3 className="text-xl font-bold">
+                  {barbeiro.nome}
+                </h3>
+
+                <p className="text-green-400">
+                  Comissão: {barbeiro.percentual_comissao}%
+                </p>
+
+              </div>
 
               <div className="flex gap-3">
 
@@ -289,17 +312,33 @@ export default function Barbeiros() {
           Editar Barbeiro
         </h2>
 
-        <input
-          type="text"
-          value={editForm.nome}
-          onChange={(e) =>
-            setEditForm({
-              ...editForm,
-              nome: e.target.value
-            })
-          }
-          className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
-        />
+        <div className="space-y-4">
+
+          <input
+            type="text"
+            value={editForm.nome}
+            onChange={(e) =>
+              setEditForm({
+                ...editForm,
+                nome: e.target.value
+              })
+            }
+            className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
+          />
+
+          <input
+            type="number"
+            value={editForm.percentual_comissao}
+            onChange={(e) =>
+              setEditForm({
+                ...editForm,
+                percentual_comissao: Number(e.target.value)
+              })
+            }
+            className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
+          />
+
+        </div>
 
         <div className="flex justify-end gap-4 mt-8">
 
