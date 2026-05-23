@@ -14,7 +14,8 @@ export default function NovoAgendamento() {
     barbeiro: "",
     servico: "",
     data: "",
-    data_hora: ""
+    dataHora: "",
+    status: "pendente"
   });
 
   const navigate = useNavigate();
@@ -127,7 +128,7 @@ useEffect(() => {
               const hora = e.target.value;
               setForm({
                 ...form,
-                data_hora: `${form.data}T${hora}:00`
+                dataHora: `${form.data}T${hora}:00`
               });
             }}
           >

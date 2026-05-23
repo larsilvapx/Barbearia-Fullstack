@@ -39,6 +39,21 @@ class Agendamento(models.Model):
     data_hora = models.DateTimeField()
     criado_em = models.DateTimeField(auto_now_add=True)
 
+    status=models.CharField(
+        max_length=20,
+        choices=[
+            ('pendente', 'Pendente'),
+            ('confirmado', 'Confirmado'),
+            ('cancelado', 'Cancelado'),
+            ('concluido', 'Concluído'),
+            
+        ],
+        default='pendente'
+    )
+
+    criado_em = models.DateTimeField(auto_now_add=True)        
+
+
     def __str__(self):
         return f"{self.cliente.nome} - {self.data_hora}" 
 

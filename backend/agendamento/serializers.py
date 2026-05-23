@@ -70,4 +70,10 @@ class AgendamentoSerializer(serializers.ModelSerializer):
             "barbeiro_comissao",
 
             "dataHora",
+            "status"
         ]
+        extra_kwargs = {
+            "status": {
+                "required": False
+            }
+        }

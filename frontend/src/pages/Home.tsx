@@ -452,9 +452,9 @@ export default function Home() {
                 Faturamento por Serviço
               </h2>
 
-              <div className="h-[350px]">
+              <div className="w-full h-[350px]">
 
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={350}>
 
                   <BarChart data={faturamentoPorServico}>
 
@@ -492,9 +492,9 @@ export default function Home() {
                 Serviços Mais Vendidos
               </h2>
 
-              <div className="h-[350px]">
+              <div className="w-full h-[350px]">
 
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={350}>
 
                   <PieChart>
 
@@ -578,6 +578,29 @@ export default function Home() {
                       <p className="text-sm text-gray-500">
                         com {a.barbeiro_nome}
                       </p>
+
+                    <div className="mt-2">
+
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold
+                          ${
+                            a.status === "confirmado"
+                              ? "bg-green-500/20 text-green-400"
+
+                            : a.status === "pendente"
+                              ? "bg-yellow-500/20 text-yellow-400"
+
+                            : a.status === "concluido"
+                              ? "bg-blue-500/20 text-blue-400"
+
+                            : "bg-red-500/20 text-red-400"
+                          }
+                        `}
+                      >
+                        {a.status}
+                      </span>
+
+                    </div>
 
                     </div>
 

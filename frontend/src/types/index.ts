@@ -33,4 +33,6 @@ export interface Agendamento {
   servico_preco?: number;
 
   barbeiro_comissao?: number;
+
+  status: string;
 }
