@@ -14,15 +14,15 @@ export default function Barbeiros() {
   const [barbeiros, setBarbeiros] = useState<Barbeiro[]>([]);
 
   const [nome, setNome] = useState("");
+
   const [percentualComissao, setPercentualComissao] = useState(40);
 
   const [loading, setLoading] = useState(true);
 
-  // DELETE
   const [openDelete, setOpenDelete] = useState(false);
+
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  // EDIT
   const [openEdit, setOpenEdit] = useState(false);
 
   const [editForm, setEditForm] = useState({
@@ -31,7 +31,6 @@ export default function Barbeiros() {
     percentual_comissao: 40
   });
 
-  // CARREGAR
   const carregarBarbeiros = async () => {
 
     try {
@@ -56,7 +55,6 @@ export default function Barbeiros() {
 
   }, []);
 
-  // CREATE
   const handleCreate = async () => {
 
     if (!nome) {
@@ -76,6 +74,7 @@ export default function Barbeiros() {
       setBarbeiros(prev => [...prev, response.data]);
 
       setNome("");
+
       setPercentualComissao(40);
 
       toast.success("Barbeiro cadastrado!");
@@ -86,7 +85,6 @@ export default function Barbeiros() {
     }
   };
 
-  // DELETE
   const openDeleteModal = (id: number) => {
 
     setSelectedId(id);
@@ -116,7 +114,6 @@ export default function Barbeiros() {
     }
   };
 
-  // EDIT
   const openEditModal = (barbeiro: Barbeiro) => {
 
     setEditForm(barbeiro);
@@ -153,51 +150,50 @@ export default function Barbeiros() {
 
   return (
 
-    <div className="min-h-screen bg-[#020617] text-white p-8">
+    <div className="min-h-screen bg-[#020617] text-white p-3 md:p-8">
 
-      {/* HEADER */}
       <div className="mb-10">
 
-        <h1 className="text-4xl font-bold">
-          Barbeiros
+        <h1 className="text-3xl md:text-4xl font-bold">
+          👨‍💼 Barbeiros
         </h1>
 
-        <p className="text-gray-400">
+        <p className="text-gray-400 mt-2">
           Gerencie os profissionais da barbearia
         </p>
 
       </div>
 
       {/* FORM */}
-      <div className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-10">
+      <div className="bg-white/5 border border-white/10 rounded-3xl p-4 md:p-6 mb-10">
 
-        <h2 className="text-2xl font-bold mb-6">
+        <h2 className="text-xl md:text-2xl font-bold mb-6">
           Novo Barbeiro
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="flex flex-col md:flex-row gap-4">
 
           <input
             type="text"
             placeholder="Nome do barbeiro"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            className="bg-black/30 border border-white/10 rounded-xl p-3"
+            className="flex-1 bg-black/30 border border-white/10 rounded-xl p-3"
           />
 
           <input
             type="number"
-            placeholder="Comissão %"
+            placeholder="% comissão"
             value={percentualComissao}
             onChange={(e) =>
               setPercentualComissao(Number(e.target.value))
             }
-            className="bg-black/30 border border-white/10 rounded-xl p-3"
+            className="w-full md:w-40 bg-black/30 border border-white/10 rounded-xl p-3"
           />
 
           <button
             onClick={handleCreate}
-            className="bg-green-500 hover:bg-green-600 rounded-xl font-semibold"
+            className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-semibold"
           >
             Cadastrar
           </button>
@@ -207,9 +203,9 @@ export default function Barbeiros() {
       </div>
 
       {/* LISTA */}
-      <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+      <div className="bg-white/5 border border-white/10 rounded-3xl p-4 md:p-6">
 
-        <h2 className="text-2xl font-bold mb-6">
+        <h2 className="text-xl md:text-2xl font-bold mb-6">
           Lista de Barbeiros
         </h2>
 
@@ -227,16 +223,16 @@ export default function Barbeiros() {
 
             <div
               key={barbeiro.id}
-              className="bg-black/30 border border-white/5 rounded-2xl p-5 flex justify-between items-center"
+              className="bg-black/30 border border-white/5 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:justify-between md:items-center gap-4"
             >
 
               <div>
 
-                <h3 className="text-xl font-bold">
+                <h3 className="text-lg md:text-xl font-bold">
                   {barbeiro.nome}
                 </h3>
 
-                <p className="text-green-400">
+                <p className="text-green-400 text-sm">
                   Comissão: {barbeiro.percentual_comissao}%
                 </p>
 
@@ -246,14 +242,14 @@ export default function Barbeiros() {
 
                 <button
                   onClick={() => openEditModal(barbeiro)}
-                  className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-4 py-2 rounded-xl"
+                  className="flex-1 md:flex-none bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-4 py-2 rounded-xl"
                 >
                   Editar
                 </button>
 
                 <button
                   onClick={() => openDeleteModal(barbeiro.id)}
-                  className="bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-xl"
+                  className="flex-1 md:flex-none bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-xl"
                 >
                   Excluir
                 </button>

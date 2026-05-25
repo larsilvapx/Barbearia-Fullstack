@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-
 import FullCalendar from "@fullcalendar/react";
 
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -8,434 +7,206 @@ import interactionPlugin from "@fullcalendar/interaction";
 
 import ptBr from "@fullcalendar/core/locales/pt-br";
 
-import type {
-  EventClickArg,
-  EventDropArg,
-  EventApi
-} from "@fullcalendar/core";
-
 import { api } from "../services/api";
 
 import toast from "react-hot-toast";
 
-import Modal from "../components/Modal";
-
-import type { Agendamento } from "../types";
-
-type Evento = {
-  id: number;
-
-  title: string;
-
-  start: string;
-
-  backgroundColor: string;
-
-  borderColor: string;
-
-  cliente_nome: string;
-
-  barbeiro_nome: string;
-
-  servico_nome: string;
-};
+import type { Agendamento, Barbeiro } from "../types";
 
 export default function Calendario() {
 
-  const [eventos, setEventos] =
-    useState<Evento[]>([]);
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
 
-  const [openModal, setOpenModal] =
-    useState(false);
+  const [barbeiros, setBarbeiros] = useState<Barbeiro[]>([]);
 
-  const [
-    eventoSelecionado,
-    setEventoSelecionado
-  ] = useState<EventApi | null>(null);
+  const [barbeiroFiltro, setBarbeiroFiltro] = useState("");
 
-  const [
-    barbeiroFiltro,
-    setBarbeiroFiltro
-  ] = useState("todos");
-
-  // CORES DOS SERVIÇOS
-  const getColor = (
-    servico: string
-  ) => {
-
-    const nome =
-      servico.toLowerCase();
-
-    if (nome.includes("corte"))
-      return "#3b82f6";
-
-    if (nome.includes("barba"))
-      return "#22c55e";
-
-    if (nome.includes("pigment"))
-      return "#a855f7";
-
-    return "#f59e0b";
-  };
-
-  // CARREGAR EVENTOS
-  const carregarEventos =
-    async () => {
-
-      try {
-
-        const response =
-          await api.get(
-            "agendamentos/"
-          );
-
-        const eventosFormatados =
-          response.data.map(
-            (a: Agendamento) => {
-
-              const color =
-                getColor(
-                  a.servico_nome
-                );
-
-              return {
-
-                id: a.id,
-
-                title:
-                  `${a.cliente_nome} - ${a.servico_nome}`,
-
-                start:
-                  a.dataHora,
-
-                backgroundColor:
-                  color,
-
-                borderColor:
-                  color,
-
-                cliente_nome:
-                  a.cliente_nome,
-
-                barbeiro_nome:
-                  a.barbeiro_nome,
-
-                servico_nome:
-                  a.servico_nome
-              };
-            }
-          );
-
-        setEventos(
-          eventosFormatados
-        );
-
-      } catch {
-
-        toast.error(
-          "Erro ao carregar calendário"
-        );
-      }
-    };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
 
-    carregarEventos();
+    carregarDados();
 
   }, []);
 
-  // CLICK EVENTO
-  const handleEventClick = (
-    info: EventClickArg
-  ) => {
+  const carregarDados = async () => {
 
-    setEventoSelecionado(
-      info.event
-    );
+    try {
 
-    setOpenModal(true);
+      const [agendamentosRes, barbeirosRes] = await Promise.all([
+        api.get("agendamentos/"),
+        api.get("barbeiros/")
+      ]);
+
+      setAgendamentos(agendamentosRes.data);
+
+      setBarbeiros(barbeirosRes.data);
+
+    } catch {
+
+      toast.error("Erro ao carregar calendário");
+
+    } finally {
+
+      setLoading(false);
+    }
   };
 
-  // DRAG AND DROP
-  const handleEventDrop =
-    async (
-      info: EventDropArg
-    ) => {
+  // FILTRO POR BARBEIRO
+  const agendamentosFiltrados = useMemo(() => {
 
-      try {
+    if (!barbeiroFiltro) {
 
-        await api.patch(
-          `agendamentos/${info.event.id}/`,
-          {
-            dataHora:
-              info.event.start
-          }
-        );
+      return agendamentos;
+    }
 
-        toast.success(
-          "Horário atualizado!"
-        );
+    return agendamentos.filter(
+      a => String(a.barbeiro) === barbeiroFiltro
+    );
 
-      } catch {
+  }, [agendamentos, barbeiroFiltro]);
 
-        toast.error(
-          "Erro ao mover agendamento"
-        );
+  // EVENTOS
+  const eventos = agendamentosFiltrados.map(a => ({
 
-        info.revert();
-      }
-    };
+    id: String(a.id),
 
-  // FILTRO BARBEIRO
-  const barbeiros =
-    useMemo(() => {
+    title: `${a.cliente_nome} - ${a.servico_nome}`,
 
-      const nomes =
-        eventos.map(
-          e => e.barbeiro_nome
-        );
+    start: a.dataHora,
 
-      return [
-        ...new Set(nomes)
-      ];
-
-    }, [eventos]);
-
-  const eventosFiltrados =
-    useMemo(() => {
-
-      if (
-        barbeiroFiltro ===
-        "todos"
-      ) {
-        return eventos;
-      }
-
-      return eventos.filter(
-        e =>
-          e.barbeiro_nome ===
-          barbeiroFiltro
-      );
-
-    }, [
-      eventos,
-      barbeiroFiltro
-    ]);
+    extendedProps: {
+      barbeiro: a.barbeiro_nome,
+      servico: a.servico_nome
+    }
+  }));
 
   return (
 
-    <div className="min-h-screen bg-[#020617] text-white p-8">
+    <div className="min-h-screen bg-[#020617] text-white p-3 md:p-8">
 
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
 
         <div>
 
-          <h1 className="text-4xl font-bold mb-2">
-            📅 Agenda Visual
+          <h1 className="text-3xl md:text-4xl font-bold">
+            📅 Calendário
           </h1>
 
-          <p className="text-gray-400">
-            Calendário profissional da barbearia
+          <p className="text-gray-400 mt-2 text-sm md:text-base">
+            Agenda completa da barbearia
           </p>
 
         </div>
 
         {/* FILTRO */}
-        <select
-          value={barbeiroFiltro}
-          onChange={(e) =>
-            setBarbeiroFiltro(
-              e.target.value
-            )
-          }
-          className="bg-white/10 border border-white/10 rounded-2xl px-4 py-3"
-        >
+        <div className="w-full md:w-72">
 
-          <option value="todos">
-            Todos barbeiros
-          </option>
+          <select
+            value={barbeiroFiltro}
+            onChange={(e) => setBarbeiroFiltro(e.target.value)}
+            className="w-full bg-white/5 border border-white/10 rounded-2xl p-3 outline-none"
+          >
 
-          {barbeiros.map(
-            nome => (
+            <option value="" className="text-black">
+              Todos os barbeiros
+            </option>
+
+            {barbeiros.map(barbeiro => (
 
               <option
-                key={nome}
-                value={nome}
+                key={barbeiro.id}
+                value={barbeiro.id}
                 className="text-black"
               >
-                {nome}
+                {barbeiro.nome}
               </option>
 
-            )
-          )}
+            ))}
 
-        </select>
+          </select>
 
-      </div>
-
-      {/* LEGENDA */}
-      <div className="flex gap-4 mb-6 flex-wrap">
-
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-blue-500"></div>
-          <span>Corte</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-green-500"></div>
-          <span>Barba</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-purple-500"></div>
-          <span>Pigmentação</span>
         </div>
 
       </div>
 
-      {/* CALENDÁRIO */}
-      <div className="bg-white rounded-3xl p-6 shadow-2xl">
+      {/* CARD CALENDÁRIO */}
+      <div className="bg-white/5 border border-white/10 rounded-3xl p-2 md:p-6 overflow-hidden">
 
-        <FullCalendar
-          plugins={[
-            dayGridPlugin,
-            timeGridPlugin,
-            interactionPlugin
-          ]}
+        {loading ? (
 
-          initialView="timeGridWeek"
+          <div className="flex justify-center items-center h-[400px]">
 
-          locale={ptBr}
+            <div className="animate-spin h-10 w-10 border-4 border-green-500 border-t-transparent rounded-full"></div>
 
-          editable={true}
+          </div>
 
-          selectable={true}
+        ) : (
 
-          events={eventosFiltrados}
+          <div className="w-full overflow-x-auto">
 
-          eventClick={
-            handleEventClick
-          }
+            <div className="min-w-[320px]">
 
-          eventDrop={
-            handleEventDrop
-          }
+              <FullCalendar
+                plugins={[
+                  dayGridPlugin,
+                  timeGridPlugin,
+                  interactionPlugin
+                ]}
 
-          height="80vh"
-
-          slotMinTime="08:00:00"
-
-          slotMaxTime="22:00:00"
-
-          allDaySlot={false}
-
-          nowIndicator={true}
-
-          headerToolbar={{
-            left:
-              "prev,next today",
-
-            center:
-              "title",
-
-            right:
-              "dayGridMonth,timeGridWeek,timeGridDay"
-          }}
-
-          buttonText={{
-            today: "Hoje",
-
-            month: "Mês",
-
-            week: "Semana",
-
-            day: "Dia"
-          }}
-        />
-
-      </div>
-
-      {/* MODAL EVENTO */}
-      <Modal
-        open={openModal}
-        onClose={() =>
-          setOpenModal(false)
-        }
-      >
-
-        <h2 className="text-3xl font-bold mb-6">
-          ✂️ Agendamento
-        </h2>
-
-        {eventoSelecionado && (
-
-          <div className="space-y-4">
-
-            <div>
-
-              <p className="text-gray-400">
-                Cliente
-              </p>
-
-              <h3 className="text-xl font-bold">
-                {
-                  eventoSelecionado
-                    .extendedProps
-                    .cliente_nome
+                initialView={
+                  window.innerWidth < 768
+                    ? "timeGridDay"
+                    : "timeGridWeek"
                 }
-              </h3>
 
-            </div>
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right:
+                    window.innerWidth < 768
+                      ? "timeGridDay"
+                      : "dayGridMonth,timeGridWeek,timeGridDay"
+                }}
 
-            <div>
+                locale={ptBr}
 
-              <p className="text-gray-400">
-                Barbeiro
-              </p>
+                events={eventos}
 
-              <h3 className="text-xl font-bold">
-                {
-                  eventoSelecionado
-                    .extendedProps
-                    .barbeiro_nome
-                }
-              </h3>
+                height="auto"
 
-            </div>
+                slotMinTime="08:00:00"
 
-            <div>
+                slotMaxTime="22:00:00"
 
-              <p className="text-gray-400">
-                Serviço
-              </p>
+                allDaySlot={false}
 
-              <h3 className="text-xl font-bold">
-                {
-                  eventoSelecionado
-                    .extendedProps
-                    .servico_nome
-                }
-              </h3>
+                expandRows={true}
 
-            </div>
+                eventClick={(info) => {
 
-            <div>
+                  toast.success(
+                    `${info.event.title} | ${info.event.extendedProps.barbeiro}`
+                  );
+                }}
 
-              <p className="text-gray-400">
-                Horário
-              </p>
+                eventContent={(eventInfo) => (
 
-              <h3 className="text-xl font-bold">
+                  <div className="p-1 md:p-2 overflow-hidden">
 
-                {eventoSelecionado.start &&
-                  new Date(
-                    eventoSelecionado.start
-                  ).toLocaleString(
-                    "pt-BR"
-                  )}
+                    <p className="font-bold text-[10px] md:text-xs truncate">
+                      {eventInfo.event.title}
+                    </p>
 
-              </h3>
+                    <p className="text-[9px] md:text-[11px] opacity-80 truncate">
+                      {eventInfo.event.extendedProps.barbeiro}
+                    </p>
+
+                  </div>
+
+                )}
+              />
 
             </div>
 
@@ -443,7 +214,7 @@ export default function Calendario() {
 
         )}
 
-      </Modal>
+      </div>
 
     </div>
   );

@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
+
 import { api } from "../services/api";
+
 import type { Agendamento } from "../types";
+
 import { Link, useNavigate } from "react-router-dom";
+
 import toast from "react-hot-toast";
+
 import Modal from "../components/Modal";
 
 import {
@@ -18,20 +23,31 @@ import {
   Cell
 } from "recharts";
 
+import {
+  Menu,
+  X
+} from "lucide-react";
+
 export default function Home() {
 
   const navigate = useNavigate();
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+
   const [loading, setLoading] = useState(true);
 
   // FILTROS
   const [search, setSearch] = useState("");
+
   const [filtro, setFiltro] = useState("todos");
 
   // DELETE
   const [openDelete, setOpenDelete] = useState(false);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  const [selectedId, setSelectedId] =
+    useState<number | null>(null);
 
   // EDIT
   const [openEdit, setOpenEdit] = useState(false);
@@ -48,8 +64,13 @@ export default function Home() {
   useEffect(() => {
 
     api.get<Agendamento[]>("agendamentos/")
+
       .then(res => setAgendamentos(res.data))
-      .catch(() => toast.error("Erro ao carregar agendamentos"))
+
+      .catch(() =>
+        toast.error("Erro ao carregar agendamentos")
+      )
+
       .finally(() => setLoading(false));
 
   }, []);
@@ -144,7 +165,9 @@ export default function Home() {
 
     const hoje = new Date().toDateString();
 
-    return new Date(a.dataHora).toDateString() === hoje;
+    return (
+      new Date(a.dataHora).toDateString() === hoje
+    );
 
   });
 
@@ -160,61 +183,72 @@ export default function Home() {
     0
   );
 
-  // TOTAL COMISSÕES
+  // COMISSÕES
   const totalComissoes = agendamentos.reduce(
-  (total, item) => {
 
-    const preco = Number(item.servico_preco || 0);
+    (total, item) => {
 
-    const percentual =
-      Number(item.barbeiro_comissao || 0);
+      const preco =
+        Number(item.servico_preco || 0);
 
-    return total + (preco * percentual) / 100;
+      const percentual =
+        Number(item.barbeiro_comissao || 0);
 
-  },
-  0
-);
+      return total + (preco * percentual) / 100;
 
-// LUCRO BARBEARIA
-  const lucroBarbearia =
-      faturamentoTotal - totalComissoes;
+    },
 
-  // GRÁFICO DE FATURAMENTO
-  const faturamentoPorServico = agendamentos.reduce((acc, item) => {
+    0
+  );
 
-  const existente = acc.find(
-      s => s.nome === item.servico_nome
-    );
+  // GRÁFICO
+  const faturamentoPorServico =
+    agendamentos.reduce((acc, item) => {
 
-    if (existente) {
+      const existente = acc.find(
+        s => s.nome === item.servico_nome
+      );
 
-      existente.valor += Number(item.servico_preco || 0);
+      if (existente) {
 
-    } else {
+        existente.valor += Number(
+          item.servico_preco || 0
+        );
 
-      acc.push({
-        nome: item.servico_nome,
-        valor: Number(item.servico_preco || 0)
-      });
-    }
+      } else {
 
-    return acc;
+        acc.push({
+          nome: item.servico_nome,
+          valor: Number(item.servico_preco || 0)
+        });
+      }
 
-  }, [] as { nome: string; valor: number }[]);
+      return acc;
 
-  // FILTRAGEM DINÂMICA
+    }, [] as { nome: string; valor: number }[]);
+
+  // FILTRAGEM
   const agendamentosFiltrados = useMemo(() => {
 
     return agendamentos
 
       .filter(a => {
 
-        const texto = search.toLowerCase();
+        const texto =
+          search.toLowerCase();
 
         const matchSearch =
-          a.cliente_nome.toLowerCase().includes(texto) ||
-          a.barbeiro_nome.toLowerCase().includes(texto) ||
-          a.servico_nome.toLowerCase().includes(texto);
+          a.cliente_nome
+            .toLowerCase()
+            .includes(texto) ||
+
+          a.barbeiro_nome
+            .toLowerCase()
+            .includes(texto) ||
+
+          a.servico_nome
+            .toLowerCase()
+            .includes(texto);
 
         if (filtro === "hoje") {
 
@@ -248,57 +282,134 @@ export default function Home() {
   }, [agendamentos, search, filtro]);
 
   return (
+
     <>
 
       <div className="min-h-screen bg-[#020617] text-white flex">
 
+        {/* OVERLAY */}
+        {menuOpen && (
+
+          <div
+            className="fixed inset-0 bg-black/60 z-40 md:hidden"
+            onClick={() => setMenuOpen(false)}
+          />
+
+        )}
+
         {/* SIDEBAR */}
-        <aside className="w-72 bg-white/5 backdrop-blur-xl border-r border-white/10 p-6 hidden md:flex flex-col justify-between">
+        <aside
+          className={`
+            fixed md:relative z-50 top-0 left-0 h-full w-72
+            bg-[#0f172a]
+            border-r border-white/10
+            p-6
+            flex flex-col justify-between
+            transform transition-transform duration-300
+            ${menuOpen
+              ? "translate-x-0"
+              : "-translate-x-full"}
+            md:translate-x-0
+          `}
+        >
 
           <div>
 
-            <h1 className="text-3xl font-extrabold mb-10">
+            {/* MOBILE HEADER */}
+            <div className="flex justify-between items-center mb-10 md:hidden">
+
+              <h1 className="text-2xl font-bold">
+                Menu
+              </h1>
+
+              <button
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+                className="bg-white/10 p-2 rounded-xl"
+              >
+                <X size={22} />
+              </button>
+
+            </div>
+
+            <h1 className="text-3xl font-extrabold mb-10 hidden md:block">
               💈 BarberPro
             </h1>
 
             <nav className="space-y-3">
 
-              <Link to="/dashboard">
+              <Link
+                to="/dashboard"
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
 
                 <button className="w-full bg-green-500/20 border border-green-500/20 text-green-400 p-3 rounded-xl text-left">
+
                   📊 Dashboard
+
                 </button>
 
               </Link>
 
-              <Link to="/calendario">
+              <Link
+                to="/calendario"
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
 
                 <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
+
                   📅 Calendário
+
                 </button>
 
               </Link>
 
-              <Link to="/barbeiros">
+              <Link
+                to="/barbeiros"
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
 
                 <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
+
                   👨‍💼 Barbeiros
+
                 </button>
 
               </Link>
 
-              <Link to="/clientes">
+              <Link
+                to="/clientes"
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
 
                 <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
+
                   👥 Clientes
+
                 </button>
 
               </Link>
 
-              <Link to="/servicos">
+              <Link
+                to="/servicos"
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
 
                 <button className="w-full hover:bg-white/5 p-3 rounded-xl text-left transition">
+
                   ✂️ Serviços
+
                 </button>
 
               </Link>
@@ -317,27 +428,49 @@ export default function Home() {
         </aside>
 
         {/* CONTEÚDO */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8">
+
+          {/* MOBILE HEADER */}
+          <div className="md:hidden flex items-center justify-between mb-6">
+
+            <h1 className="text-2xl font-bold">
+              💈 BarberPro
+            </h1>
+
+            <button
+              onClick={() =>
+                setMenuOpen(true)
+              }
+              className="bg-white/10 p-3 rounded-xl"
+            >
+              <Menu size={24} />
+            </button>
+
+          </div>
 
           {/* TOPO */}
-          <div className="flex justify-between items-center mb-10">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-10">
 
             <div>
 
-              <h2 className="text-4xl font-bold">
+              <h2 className="text-3xl md:text-4xl font-bold">
                 Dashboard
               </h2>
 
-              <p className="text-gray-400">
+              <p className="text-sm md:text-base text-gray-400">
+
                 Controle completo da barbearia
+
               </p>
 
             </div>
 
             <Link to="/novo">
 
-              <button className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-3 rounded-xl font-semibold shadow-2xl hover:scale-105 transition-all duration-300">
+              <button className="w-full md:w-auto bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-3 rounded-xl font-semibold shadow-2xl hover:scale-105 transition-all duration-300">
+
                 + Novo Agendamento
+
               </button>
 
             </Link>
@@ -345,7 +478,7 @@ export default function Home() {
           </div>
 
           {/* CARDS */}
-          <div className="grid md:grid-cols-4 gap-6 mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
 
             <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-xl">
 
@@ -353,8 +486,10 @@ export default function Home() {
                 Total
               </p>
 
-              <h3 className="text-4xl font-extrabold">
+              <h3 className="text-3xl md:text-4xl font-extrabold">
+
                 {agendamentos.length}
+
               </h3>
 
             </div>
@@ -365,8 +500,10 @@ export default function Home() {
                 Hoje
               </p>
 
-              <h3 className="text-4xl font-extrabold text-green-400">
+              <h3 className="text-3xl md:text-4xl font-extrabold text-green-400">
+
                 {agendamentosHoje.length}
+
               </h3>
 
             </div>
@@ -377,8 +514,10 @@ export default function Home() {
                 Próximos
               </p>
 
-              <h3 className="text-4xl font-extrabold text-blue-400">
+              <h3 className="text-3xl md:text-4xl font-extrabold text-blue-400">
+
                 {proximos.length}
+
               </h3>
 
             </div>
@@ -389,23 +528,13 @@ export default function Home() {
                 Faturamento
               </p>
 
-              <h3 className="text-4xl font-extrabold text-yellow-400">
+              <h3 className="text-3xl md:text-4xl font-extrabold text-yellow-400">
+
                 R$ {faturamentoTotal.toFixed(2)}
+
               </h3>
 
             </div>
-
-          </div>
-
-          <div className="bg-pink-500/10 border border-pink-500/20 p-6 rounded-3xl backdrop-blur-xl">
-
-            <p className="text-pink-300 mb-2">
-              Lucro
-            </p>
-
-            <h3 className="text-4xl font-extrabold text-pink-400">
-              R$ {lucroBarbearia.toFixed(2)}
-            </h3>
 
           </div>
 
@@ -416,13 +545,17 @@ export default function Home() {
               type="text"
               placeholder="🔍 Buscar cliente, barbeiro ou serviço..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
               className="flex-1 bg-white/5 border border-white/10 rounded-2xl p-4 outline-none focus:border-green-500"
             />
 
             <select
               value={filtro}
-              onChange={(e) => setFiltro(e.target.value)}
+              onChange={(e) =>
+                setFiltro(e.target.value)
+              }
               className="bg-white/5 border border-white/10 rounded-2xl p-4 outline-none"
             >
 
@@ -445,16 +578,18 @@ export default function Home() {
           {/* GRÁFICOS */}
           <div className="grid lg:grid-cols-2 gap-6 mt-10 mb-10">
 
-            {/* BAR CHART */}
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+            {/* BAR */}
+            <div className="bg-white/5 border border-white/10 rounded-3xl p-3 md:p-6 backdrop-blur-xl overflow-x-auto">
 
               <h2 className="text-2xl font-bold mb-6">
+
                 Faturamento por Serviço
+
               </h2>
 
-              <div className="w-full h-[350px]">
+              <div className="h-[350px] min-w-[300px]">
 
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height="100%">
 
                   <BarChart data={faturamentoPorServico}>
 
@@ -485,16 +620,18 @@ export default function Home() {
 
             </div>
 
-            {/* PIE CHART */}
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+            {/* PIE */}
+            <div className="bg-white/5 border border-white/10 rounded-3xl p-3 md:p-6 backdrop-blur-xl overflow-x-auto">
 
               <h2 className="text-2xl font-bold mb-6">
+
                 Serviços Mais Vendidos
+
               </h2>
 
-              <div className="w-full h-[350px]">
+              <div className="h-[350px] min-w-[300px]">
 
-                <ResponsiveContainer width="100%" height={350}>
+                <ResponsiveContainer width="100%" height="100%">
 
                   <PieChart>
 
@@ -526,132 +663,6 @@ export default function Home() {
 
           </div>
 
-          {/* LISTA */}
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-xl">
-
-            <h3 className="text-2xl font-bold mb-6">
-              Agendamentos
-            </h3>
-
-            {/* LOADING */}
-            {loading && (
-
-              <div className="flex justify-center py-10">
-
-                <div className="animate-spin h-10 w-10 border-4 border-green-500 border-t-transparent rounded-full"></div>
-
-              </div>
-
-            )}
-
-            {/* VAZIO */}
-            {!loading && agendamentosFiltrados.length === 0 && (
-
-              <div className="text-center text-gray-400 py-10">
-                Nenhum agendamento encontrado
-              </div>
-
-            )}
-
-            {/* ITENS */}
-            <div className="space-y-4">
-
-              {agendamentosFiltrados.map(a => (
-
-                <div
-                  key={a.id}
-                  className="bg-black/30 border border-white/5 rounded-2xl p-5 hover:border-green-500/40 hover:scale-[1.01] transition-all duration-300"
-                >
-
-                  <div className="flex justify-between items-center">
-
-                    <div>
-
-                      <h4 className="text-xl font-bold">
-                        {a.cliente_nome}
-                      </h4>
-
-                      <p className="text-gray-400">
-                        {a.servico_nome}
-                      </p>
-
-                      <p className="text-sm text-gray-500">
-                        com {a.barbeiro_nome}
-                      </p>
-
-                    <div className="mt-2">
-
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold
-                          ${
-                            a.status === "confirmado"
-                              ? "bg-green-500/20 text-green-400"
-
-                            : a.status === "pendente"
-                              ? "bg-yellow-500/20 text-yellow-400"
-
-                            : a.status === "concluido"
-                              ? "bg-blue-500/20 text-blue-400"
-
-                            : "bg-red-500/20 text-red-400"
-                          }
-                        `}
-                      >
-                        {a.status}
-                      </span>
-
-                    </div>
-
-                    </div>
-
-                    <div className="text-right">
-
-                      <p className="text-gray-400">
-                        {a.dataHora
-                          ? new Date(a.dataHora).toLocaleDateString("pt-BR")
-                          : "Data inválida"}
-                      </p>
-
-                      <p className="text-green-400 font-bold text-lg">
-                        {a.dataHora
-                          ? new Date(a.dataHora).toLocaleTimeString("pt-BR", {
-                              hour: "2-digit",
-                              minute: "2-digit"
-                            })
-                          : "Horário inválido"}
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  {/* AÇÕES */}
-                  <div className="flex justify-end gap-3 mt-5">
-
-                    <button
-                      onClick={() => openEditModal(a)}
-                      className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-4 py-2 rounded-xl transition"
-                    >
-                      Editar
-                    </button>
-
-                    <button
-                      onClick={() => openDeleteModal(a.id)}
-                      className="bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-xl transition"
-                    >
-                      Excluir
-                    </button>
-
-                  </div>
-
-                </div>
-
-              ))}
-
-            </div>
-
-          </div>
-
         </main>
 
       </div>
@@ -663,17 +674,23 @@ export default function Home() {
       >
 
         <h2 className="text-2xl font-bold text-white mb-4">
+
           Excluir agendamento
+
         </h2>
 
         <p className="text-gray-400 mb-8">
+
           Tem certeza que deseja excluir este agendamento?
+
         </p>
 
         <div className="flex justify-end gap-4">
 
           <button
-            onClick={() => setOpenDelete(false)}
+            onClick={() =>
+              setOpenDelete(false)
+            }
             className="bg-white/10 hover:bg-white/20 px-5 py-2 rounded-xl transition"
           >
             Cancelar
@@ -697,7 +714,9 @@ export default function Home() {
       >
 
         <h2 className="text-2xl font-bold mb-6">
+
           Editar Agendamento
+
         </h2>
 
         <div className="space-y-4">
@@ -758,7 +777,9 @@ export default function Home() {
         <div className="flex justify-end gap-4 mt-8">
 
           <button
-            onClick={() => setOpenEdit(false)}
+            onClick={() =>
+              setOpenEdit(false)
+            }
             className="bg-white/10 hover:bg-white/20 px-5 py-2 rounded-xl transition"
           >
             Cancelar
@@ -776,5 +797,6 @@ export default function Home() {
       </Modal>
 
     </>
+
   );
 }

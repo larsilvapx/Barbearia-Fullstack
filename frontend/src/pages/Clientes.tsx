@@ -6,8 +6,6 @@ import Modal from "../components/Modal";
 type Cliente = {
   id: number;
   nome: string;
-  telefone: string;
-  email: string;
 };
 
 export default function Clientes() {
@@ -15,13 +13,12 @@ export default function Clientes() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
 
   const [nome, setNome] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [email, setEmail] = useState("");
 
   const [loading, setLoading] = useState(true);
 
   // DELETE
   const [openDelete, setOpenDelete] = useState(false);
+
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   // EDIT
@@ -29,12 +26,10 @@ export default function Clientes() {
 
   const [editForm, setEditForm] = useState({
     id: 0,
-    nome: "",
-    telefone: "",
-    email: ""
+    nome: ""
   });
 
-  // CARREGAR CLIENTES
+  // CARREGAR
   const carregarClientes = async () => {
 
     try {
@@ -43,16 +38,13 @@ export default function Clientes() {
 
       setClientes(response.data);
 
-    } catch (error) {
-
-      console.log(error);
+    } catch {
 
       toast.error("Erro ao carregar clientes");
 
     } finally {
 
       setLoading(false);
-
     }
   };
 
@@ -62,12 +54,12 @@ export default function Clientes() {
 
   }, []);
 
-  // CADASTRAR
+  // CREATE
   const handleCreate = async () => {
 
-    if (!nome || !telefone || !email) {
+    if (!nome) {
 
-      toast.error("Preencha todos os campos");
+      toast.error("Digite o nome");
 
       return;
     }
@@ -75,24 +67,18 @@ export default function Clientes() {
     try {
 
       const response = await api.post("clientes/", {
-        nome,
-        telefone,
-        email
+        nome
       });
 
       setClientes(prev => [...prev, response.data]);
 
       setNome("");
-      setTelefone("");
-      setEmail("");
 
       toast.success("Cliente cadastrado!");
 
-    } catch (error) {
+    } catch {
 
-      console.log(error);
-
-      toast.error("Erro ao cadastrar cliente");
+      toast.error("Erro ao cadastrar");
     }
   };
 
@@ -122,11 +108,11 @@ export default function Clientes() {
 
     } catch {
 
-      toast.error("Erro ao excluir cliente");
+      toast.error("Erro ao excluir");
     }
   };
 
-  // EDITAR
+  // EDIT
   const openEditModal = (cliente: Cliente) => {
 
     setEditForm(cliente);
@@ -155,71 +141,49 @@ export default function Clientes() {
 
       setOpenEdit(false);
 
-    } catch (error) {
+    } catch {
 
-      console.log(error);
-
-      toast.error("Erro ao atualizar cliente");
+      toast.error("Erro ao atualizar");
     }
   };
 
   return (
 
-    <div className="min-h-screen bg-[#020617] text-white p-8">
+    <div className="min-h-screen bg-[#020617] text-white p-3 md:p-8">
 
-      <div className="flex justify-between items-center mb-10">
+      {/* HEADER */}
+      <div className="mb-10">
 
-        <div>
+        <h1 className="text-3xl md:text-4xl font-bold">
+          👥 Clientes
+        </h1>
 
-          <h1 className="text-4xl font-bold">
-            Clientes
-          </h1>
-
-          <p className="text-gray-400">
-            Gerencie os clientes da barbearia
-          </p>
-
-        </div>
+        <p className="text-gray-400 mt-2 text-sm md:text-base">
+          Gerencie os clientes da barbearia
+        </p>
 
       </div>
 
       {/* FORM */}
-      <div className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-10">
+      <div className="bg-white/5 border border-white/10 rounded-3xl p-4 md:p-6 mb-10 backdrop-blur-xl">
 
-        <h2 className="text-2xl font-bold mb-6">
+        <h2 className="text-xl md:text-2xl font-bold mb-6">
           Novo Cliente
         </h2>
 
-        <div className="grid md:grid-cols-4 gap-4">
+        <div className="flex flex-col md:flex-row gap-4">
 
           <input
             type="text"
-            placeholder="Nome"
+            placeholder="Nome do cliente"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            className="bg-black/30 border border-white/10 rounded-xl p-3"
+            className="flex-1 bg-black/30 border border-white/10 rounded-xl p-3 outline-none focus:border-green-500 transition"
           />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="bg-black/30 border border-white/10 rounded-xl p-3"
-          />
-
-          <input
-            type="text"
-            placeholder="Telefone"
-            value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
-            className="bg-black/30 border border-white/10 rounded-xl p-3"
-          />
-
-          
 
           <button
             onClick={handleCreate}
-            className="bg-green-500 hover:bg-green-600 rounded-xl font-semibold"
+            className="w-full md:w-auto bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-semibold transition"
           >
             Cadastrar
           </button>
@@ -229,57 +193,66 @@ export default function Clientes() {
       </div>
 
       {/* LISTA */}
-      <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+      <div className="bg-white/5 border border-white/10 rounded-3xl p-4 md:p-6 backdrop-blur-xl">
 
-        <h2 className="text-2xl font-bold mb-6">
+        <h2 className="text-xl md:text-2xl font-bold mb-6">
           Lista de Clientes
         </h2>
 
+        {/* LOADING */}
         {loading && (
 
-          <div className="text-center py-10">
-            Carregando...
+          <div className="flex justify-center py-10">
+
+            <div className="animate-spin h-10 w-10 border-4 border-green-500 border-t-transparent rounded-full"></div>
+
           </div>
 
         )}
 
+        {/* VAZIO */}
+        {!loading && clientes.length === 0 && (
+
+          <div className="text-center text-gray-400 py-10">
+            Nenhum cliente cadastrado
+          </div>
+
+        )}
+
+        {/* ITENS */}
         <div className="space-y-4">
 
           {clientes.map(cliente => (
 
             <div
               key={cliente.id}
-              className="bg-black/30 border border-white/5 rounded-2xl p-5 flex justify-between items-center"
+              className="bg-black/30 border border-white/5 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:justify-between md:items-center gap-4 hover:border-green-500/40 hover:scale-[1.01] transition-all duration-300"
             >
 
               <div>
 
-                <h3 className="text-xl font-bold">
+                <h3 className="text-lg md:text-xl font-bold">
                   {cliente.nome}
                 </h3>
 
-                <p className="text-gray-400">
-                  {cliente.telefone}
-                </p>
-
-                <p className="text-gray-500 text-sm">
-                  {cliente.email}
+                <p className="text-gray-400 text-sm">
+                  Cliente cadastrado no sistema
                 </p>
 
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 w-full md:w-auto">
 
                 <button
                   onClick={() => openEditModal(cliente)}
-                  className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-4 py-2 rounded-xl"
+                  className="flex-1 md:flex-none bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 px-4 py-2 rounded-xl transition"
                 >
                   Editar
                 </button>
 
                 <button
                   onClick={() => openDeleteModal(cliente.id)}
-                  className="bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-xl"
+                  className="flex-1 md:flex-none bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-xl transition"
                 >
                   Excluir
                 </button>
@@ -301,25 +274,25 @@ export default function Clientes() {
       >
 
         <h2 className="text-2xl font-bold mb-4">
-          Excluir Cliente
+          Excluir cliente
         </h2>
 
         <p className="text-gray-400 mb-6">
-          Deseja realmente excluir?
+          Deseja realmente excluir este cliente?
         </p>
 
         <div className="flex justify-end gap-4">
 
           <button
             onClick={() => setOpenDelete(false)}
-            className="bg-white/10 px-5 py-2 rounded-xl"
+            className="bg-white/10 hover:bg-white/20 px-5 py-2 rounded-xl transition"
           >
             Cancelar
           </button>
 
           <button
             onClick={handleDelete}
-            className="bg-red-500 px-5 py-2 rounded-xl"
+            className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl transition"
           >
             Excluir
           </button>
@@ -338,58 +311,30 @@ export default function Clientes() {
           Editar Cliente
         </h2>
 
-        <div className="space-y-4">
-
-          <input
-            type="text"
-            value={editForm.nome}
-            onChange={(e) =>
-              setEditForm({
-                ...editForm,
-                nome: e.target.value
-              })
-            }
-            className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
-          />
-
-          <input
-            type="text"
-            value={editForm.telefone}
-            onChange={(e) =>
-              setEditForm({
-                ...editForm,
-                telefone: e.target.value
-              })
-            }
-            className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
-          />
-
-          <input
-            type="email"
-            value={editForm.email}
-            onChange={(e) =>
-              setEditForm({
-                ...editForm,
-                email: e.target.value
-              })
-            }
-            className="w-full bg-black/30 border border-white/10 rounded-xl p-3"
-          />
-
-        </div>
+        <input
+          type="text"
+          value={editForm.nome}
+          onChange={(e) =>
+            setEditForm({
+              ...editForm,
+              nome: e.target.value
+            })
+          }
+          className="w-full bg-black/30 border border-white/10 rounded-xl p-3 outline-none focus:border-green-500 transition"
+        />
 
         <div className="flex justify-end gap-4 mt-8">
 
           <button
             onClick={() => setOpenEdit(false)}
-            className="bg-white/10 px-5 py-2 rounded-xl"
+            className="bg-white/10 hover:bg-white/20 px-5 py-2 rounded-xl transition"
           >
             Cancelar
           </button>
 
           <button
             onClick={handleUpdate}
-            className="bg-green-500 px-5 py-2 rounded-xl"
+            className="bg-green-500 hover:bg-green-600 px-5 py-2 rounded-xl transition"
           >
             Salvar
           </button>
