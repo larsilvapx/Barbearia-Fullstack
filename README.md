@@ -1,136 +1,189 @@
-# 💈 Barbearia Fullstack
+💈 BarberPro
 
-Sistema completo de agendamento para barbearias, permitindo gerenciar clientes, barbeiros, serviços e horários de forma eficiente.
+Sistema completo de gerenciamento para barbearias desenvolvido com React + TypeScript no frontend e Django REST Framework no backend.
 
----
+O projeto permite controlar clientes, barbeiros, serviços e agendamentos, além de possuir dashboard financeiro, calendário inteligente e interface moderna responsiva.
 
-##  Sobre o projeto
+🚀 Tecnologias Utilizadas
+Frontend
+React
+TypeScript
+Vite
+TailwindCSS
+React Router DOM
+Axios
+React Hot Toast
+FullCalendar
+Recharts
+Lucide React
+Backend
+Python
+Django
+Django REST Framework
+Simple JWT
+SQLite
+✨ Funcionalidades Implementadas
+🔐 Autenticação
+Login com JWT
+Proteção de rotas
+Logout seguro
+👥 Clientes
+Cadastro de clientes
+Edição de clientes
+Exclusão de clientes
+Listagem dinâmica
+Busca em tempo real
+👨‍💼 Barbeiros
+Cadastro de barbeiros
+Percentual de comissão
+Edição e exclusão
+Integração financeira
+✂️ Serviços
+Cadastro de serviços
+Valor dos serviços
+Atualização dinâmica
+Remoção de serviços
+📅 Agendamentos
+Criação de agendamentos
+Seleção de cliente
+Seleção de barbeiro
+Seleção de serviço
+Seleção de horário
+Controle de horários disponíveis
+Exclusão de agendamentos
+Edição de agendamentos
+🗓️ Calendário Inteligente
+Visualização mensal
+Visualização semanal
+Visualização diária
+Agenda por barbeiro
+Filtro individual de profissionais
+Eventos coloridos
+Clique em eventos
+Responsividade mobile
+📊 Dashboard Financeiro
+Total de agendamentos
+Agendamentos do dia
+Próximos atendimentos
+Faturamento total
+Controle de comissões
+Gráfico de faturamento por serviço
+Serviços mais vendidos
+Busca dinâmica
+Filtros inteligentes
+📱 Responsividade
 
-Este projeto foi desenvolvido com o objetivo de simular um sistema real de gestão de barbearia, aplicando conceitos de desenvolvimento fullstack,
-integração entre API e interface web, além de boas práticas de organização de código.
+O sistema foi totalmente adaptado para:
 
----
+Desktop
+Tablet
+Smartphones
 
-##  Arquitetura
+Incluindo:
 
-O sistema é dividido em duas partes principais:
+Sidebar mobile
+Menu hamburguer
+Layout adaptativo
+Gráficos responsivos
+Cards responsivos
+🎨 Interface
+Design moderno
+Tema dark profissional
+Animações suaves
+Feedback visual
+Modais customizados
+UX otimizada
+🧠 Estrutura Inteligente do Sistema
+Backend
 
-* **Backend:** responsável pelas regras de negócio e API
-* **Frontend:** responsável pela interface do usuário
+O backend foi estruturado utilizando:
 
-```
-/backend  → API REST (Django)
-/frontend → Interface (React)
-```
+Models
+Serializers
+ViewSets
+Rotas REST
+JWT Authentication
+Frontend
 
----
+O frontend utiliza:
 
-##  Tecnologias utilizadas
+Componentização
+Hooks
+Tipagem forte com TypeScript
+Organização por páginas
+Serviços centralizados de API
+📂 Estrutura do Projeto
+frontend/
+ ├── src/
+ │   ├── pages/
+ │   ├── components/
+ │   ├── services/
+ │   ├── routes/
+ │   └── types/
 
-###  Backend
-
-* Python
-* Django
-* Django REST Framework
-
-###  Frontend
-
-* React
-* Vite
-* TypeScript
-* Tailwind CSS
-
----
-
-##  Funcionalidades
-
-* ✅ Cadastro de clientes
-* ✅ Cadastro de barbeiros
-* ✅ Cadastro de serviços
-* ✅ Criação de agendamentos
-* ✅ Edição de agendamentos
-* ✅ Exclusão de agendamentos
-* ✅ Listagem com filtros
-* ✅ Integração completa com API REST
-
----
-
-##  Demonstração
-
-> <img width="1546" height="482" alt="image" src="https://github.com/user-attachments/assets/c04ddb0f-95f6-419f-bbcf-a48eb66c9c0f" />
-<img width="368" height="262" alt="image" src="https://github.com/user-attachments/assets/52a1a15e-9c76-40d7-be42-c059ddf01291" />
-
-
-
-##  Como executar o projeto
-
-###  Backend
-
-```bash
+backend/
+ ├── agendamento/
+ ├── barberpro/
+ ├── manage.py
+⚙️ Como Rodar o Projeto
+Backend
 cd backend
+
+python -m venv venv
+
+venv\Scripts\activate
+
 pip install -r requirements.txt
+
+python manage.py migrate
+
 python manage.py runserver
-```
 
-Servidor disponível em:
+Servidor:
 
-```
-http://127.0.0.1:8000/
-```
-
----
-
-###  Frontend
-
-```bash
+http://127.0.0.1:8000
+Frontend
 cd frontend
+
 npm install
+
 npm run dev
-```
 
-Aplicação disponível em:
+Aplicação:
 
-```
-http://localhost:5173/
-```
+http://localhost:5173
+🔑 Credenciais JWT
 
----
+Endpoint:
 
-##  Integração
+/api/token/
+📈 Próximos Upgrades
+🟣 Nível Profissional
+Controle financeiro avançado
+Relatórios PDF
+Dashboard administrativo
+Multiusuário
+Níveis de acesso
+Confirmação por WhatsApp
+Notificações automáticas
+Deploy em produção
+Integração com IA
+PWA
+Tema customizável
+👨‍💻 Desenvolvedor
 
-O frontend consome a API do backend através de requisições HTTP, utilizando serviços centralizados para comunicação com os endpoints.
+Projeto desenvolvido por Luciano Rodrigues com foco em:
 
----
+Backend Python
+Frontend React
+APIs REST
+UX/UI moderna
+Sistemas profissionais completos
+📌 Status do Projeto
 
-##  Aprendizados
-
-Durante o desenvolvimento deste projeto, foram aplicados conceitos como:
-
-* Estruturação de projetos fullstack
-* Criação de APIs REST com Django
-* Consumo de APIs com React
-* Organização de código em camadas
-* Integração entre frontend e backend
-* Boas práticas com Git e versionamento
-
----
-
-##  Próximas melhorias
-
-* 🔐 Autenticação de usuários (login)
-* 📅 Validação avançada de horários
-* 📱 Responsividade completa
-* ☁️ Deploy em produção
-* 🧪 Testes automatizados
-
----
-
-##  Autor
-
-Desenvolvido por Luciano Rodrigues
-
----
-
-##  Licença
-
-Este projeto está sob a licença MIT.
+🚧 Em desenvolvimento contínuo
+✅ Estrutura principal finalizada
+✅ Dashboard profissional implementado
+✅ Calendário inteligente implementado
+✅ Responsividade mobile implementada
+✅ Controle financeiro implementado
