@@ -5,6 +5,9 @@ from .views import (
     ServicoViewSet,
     AgendamentoViewSet
 )
+from rest_framework.decorators import action
+from django.http import FileResponse
+
 
 router = DefaultRouter()
 
