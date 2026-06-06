@@ -25,7 +25,12 @@ import {
 
 import {
   Menu,
-  X
+  X,
+  Users,
+  Calendar,
+  DollarSign,
+  Clock,
+  Scissors
 } from "lucide-react";
 
 export default function Home() {
@@ -200,10 +205,27 @@ export default function Home() {
 
     0
   );
+  // METAS MENSAIS
+
+  const metaMensal = 5000;
+
+  const percentualMeta =
+    (faturamentoTotal / metaMensal) * 100;
+
+  const dataAtual = new Date().toLocaleDateString(
+    "pt-BR",
+    {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }
+  );
 
   // GRÁFICO
   const faturamentoPorServico =
     agendamentos.reduce((acc, item) => {
+      
 
       const existente = acc.find(
         s => s.nome === item.servico_nome
@@ -226,6 +248,60 @@ export default function Home() {
       return acc;
 
     }, [] as { nome: string; valor: number }[]);
+
+    //RELATÓRIO PDF
+  const gerarPDF = async () => {
+
+      try {
+
+        const response = await api.get(
+          "relatorios/pdf/",
+          {
+            responseType: "blob"
+          }
+        );
+
+        const url =
+          window.URL.createObjectURL(
+            new Blob([response.data])
+          );
+
+        const link =
+          document.createElement("a");
+
+        link.href = url;
+
+        link.setAttribute(
+          "download",
+          "relatorio.pdf"
+        );
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+      } catch {
+
+        toast.error(
+          "Erro ao gerar PDF"
+        );
+
+      }
+
+    };
+
+  const COLORS = [
+    "#22c55e",
+     "#3b82f6",
+     "#f59e0b",
+     "#ec4899",
+     "#8b5cf6",
+     "#14b8a6"
+     ];        
+
+    
 
   // FILTRAGEM
   const agendamentosFiltrados = useMemo(() => {
@@ -449,94 +525,197 @@ export default function Home() {
           </div>
 
           {/* TOPO */}
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-10">
+          {/* HERO SECTION */}
+          <div className="relative overflow-hidden bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#334155] rounded-3xl p-8 mb-10 border border-white/10">
 
-            <div>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl" />
 
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Dashboard
-              </h2>
+            <div className="relative z-10">
 
-              <p className="text-sm md:text-base text-gray-400">
+              <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
+                💈 BarberPro
+              </h1>
 
-                Controle completo da barbearia
-
+              <p className="text-lg text-gray-300">
+                Controle completo da sua barbearia.
               </p>
 
-            </div>
+              <p className="text-sm text-gray-400 mt-2">
+                {dataAtual}
+              </p>
 
-            <Link to="/novo">
+              <div className="flex flex-wrap gap-4 mt-6">
 
-              <button className="w-full md:w-auto bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-3 rounded-xl font-semibold shadow-2xl hover:scale-105 transition-all duration-300">
+                <div className="bg-white/10 px-4 py-2 rounded-xl">
+                  📅 {agendamentosHoje.length} atendimentos hoje
+                </div>
 
-                + Novo Agendamento
+                <div className="bg-white/10 px-4 py-2 rounded-xl">
+                  💰 R$ {faturamentoTotal.toFixed(2)}
+                </div>
+
+                <div className="bg-white/10 px-4 py-2 rounded-xl">
+                  ✂️ {faturamentoPorServico.length} serviços
+                </div>
+
+              </div>
+
+              <div className="flex gap-4 mt-6">
+
+              <Link to="/novo">
+
+                <button className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-semibold transition">
+
+                  + Novo Agendamento
+
+                </button>
+
+              </Link>
+
+              <button
+                onClick={gerarPDF}
+                className="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-semibold transition"
+              >
+
+                📄 Exportar PDF
 
               </button>
 
-            </Link>
+            </div>
+
+            </div>
 
           </div>
 
           {/* CARDS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-10">
 
-            <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-xl">
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
 
-              <p className="text-gray-400 mb-2">
-                Total
-              </p>
+            <div className="flex justify-between items-center">
 
-              <h3 className="text-3xl md:text-4xl font-extrabold">
+              <div>
 
-                {agendamentos.length}
+                <p className="text-gray-400">
+                  Total
+                </p>
 
-              </h3>
+                <h3 className="text-4xl font-bold">
+                  {agendamentos.length}
+                </h3>
 
-            </div>
+              </div>
 
-            <div className="bg-green-500/10 border border-green-500/20 p-6 rounded-3xl backdrop-blur-xl">
-
-              <p className="text-green-300 mb-2">
-                Hoje
-              </p>
-
-              <h3 className="text-3xl md:text-4xl font-extrabold text-green-400">
-
-                {agendamentosHoje.length}
-
-              </h3>
-
-            </div>
-
-            <div className="bg-blue-500/10 border border-blue-500/20 p-6 rounded-3xl backdrop-blur-xl">
-
-              <p className="text-blue-300 mb-2">
-                Próximos
-              </p>
-
-              <h3 className="text-3xl md:text-4xl font-extrabold text-blue-400">
-
-                {proximos.length}
-
-              </h3>
-
-            </div>
-
-            <div className="bg-yellow-500/10 border border-yellow-500/20 p-6 rounded-3xl backdrop-blur-xl">
-
-              <p className="text-yellow-300 mb-2">
-                Faturamento
-              </p>
-
-              <h3 className="text-3xl md:text-4xl font-extrabold text-yellow-400">
-
-                R$ {faturamentoTotal.toFixed(2)}
-
-              </h3>
+              <Users
+                size={40}
+                className="text-green-400"
+              />
 
             </div>
 
           </div>
+
+          <div className="bg-green-500/10 border border-green-500/20 rounded-3xl p-6">
+
+            <div className="flex justify-between items-center">
+
+              <div>
+
+                <p className="text-green-300">
+                  Hoje
+                </p>
+
+                <h3 className="text-4xl font-bold text-green-400">
+                  {agendamentosHoje.length}
+                </h3>
+
+              </div>
+
+              <Calendar
+                size={40}
+                className="text-green-400"
+              />
+
+            </div>
+
+          </div>
+
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-3xl p-6">
+
+            <div className="flex justify-between items-center">
+
+              <div>
+
+                <p className="text-blue-300">
+                  Próximos
+                </p>
+
+                <h3 className="text-4xl font-bold text-blue-400">
+                  {proximos.length}
+                </h3>
+
+              </div>
+
+              <Clock
+                size={40}
+                className="text-blue-400"
+              />
+
+            </div>
+
+          </div>
+
+          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-3xl p-6">
+
+            <div className="flex justify-between items-center">
+
+              <div>
+
+                <p className="text-yellow-300">
+                  Receita
+                </p>
+
+                <h3 className="text-4xl font-bold text-yellow-400">
+                  R$ {faturamentoTotal.toFixed(2)}
+                </h3>
+
+              </div>
+
+              <DollarSign
+                size={40}
+                className="text-yellow-400"
+              />
+
+            </div>
+
+          </div>
+
+          <div className="bg-purple-500/10 border border-purple-500/20 rounded-3xl p-6">
+
+            <div className="flex justify-between items-center">
+
+              <div>
+
+                <p className="text-purple-300">
+                  Comissões
+                </p>
+
+                <h3 className="text-4xl font-bold text-purple-400">
+                  R$ {totalComissoes.toFixed(2)}
+                </h3>
+
+              </div>
+
+              <Scissors
+                size={40}
+                className="text-purple-400"
+              />
+
+            </div>
+
+          </div>
+
+        </div>
 
           {/* FILTROS */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -575,7 +754,38 @@ export default function Home() {
 
           </div>
 
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-10">
+
+          <div className="flex justify-between mb-4">
+
+            <span className="font-semibold">
+              Meta Mensal
+            </span>
+
+            <span>
+
+              R$ {faturamentoTotal.toFixed(2)}
+              / R$ {metaMensal}
+
+            </span>
+
+          </div>
+
+          <div className="w-full h-4 bg-black/30 rounded-full overflow-hidden">
+
+            <div
+              className="h-full bg-green-500"
+              style={{
+                width: `${Math.min(percentualMeta, 100)}%`
+              }}
+            />
+
+          </div>
+
+        </div>
+
           {/* GRÁFICOS */}
+          
           <div className="grid lg:grid-cols-2 gap-6 mt-10 mb-10">
 
             {/* BAR */}
@@ -609,6 +819,7 @@ export default function Home() {
 
                     <Bar
                       dataKey="valor"
+                      fill="#22c55e"
                       radius={[10, 10, 0, 0]}
                     />
 
@@ -644,8 +855,10 @@ export default function Home() {
                     >
 
                       {faturamentoPorServico.map((_, index) => (
-
-                        <Cell key={index} />
+                        <Cell
+                          key={index}
+                          fill={COLORS[index % COLORS.length]}
+                        />
 
                       ))}
 
@@ -666,6 +879,133 @@ export default function Home() {
         </main>
 
       </div>
+
+      
+
+      
+
+      {/* PRÓXIMOS ATENDIMENTOS */}
+<div className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-10">
+
+  <h2 className="text-2xl font-bold mb-6">
+    Próximos Atendimentos
+  </h2>
+
+  <div className="space-y-4">
+
+    {proximos
+      .sort(
+        (a, b) =>
+          new Date(a.dataHora).getTime() -
+          new Date(b.dataHora).getTime()
+      )
+      .slice(0, 5)
+      .map(item => (
+
+        <div
+          key={item.id}
+          className="flex justify-between items-center border-b border-white/10 pb-3"
+        >
+
+          <div>
+
+            <p className="font-semibold">
+              {item.cliente_nome}
+            </p>
+
+            <p className="text-sm text-gray-400">
+              {item.servico_nome}
+            </p>
+
+          </div>
+
+          <span className="text-green-400">
+            {new Date(item.dataHora)
+              .toLocaleString("pt-BR")}
+          </span>
+
+        </div>
+
+      ))}
+
+  </div>
+
+</div>
+
+{/* ÚLTIMOS AGENDAMENTOS */}
+<div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+
+  <h2 className="text-2xl font-bold mb-6">
+    Últimos Agendamentos
+  </h2>
+
+  <div className="overflow-x-auto">
+
+    <table className="w-full">
+
+      <thead>
+
+        <tr className="border-b border-white/10">
+
+          <th className="text-left py-3">
+            Cliente
+          </th>
+
+          <th className="text-left py-3">
+            Serviço
+          </th>
+
+          <th className="text-left py-3">
+            Barbeiro
+          </th>
+
+          <th className="text-left py-3">
+            Data
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        {agendamentosFiltrados
+          .slice(0, 10)
+          .map(item => (
+
+            <tr
+              key={item.id}
+              className="border-b border-white/5"
+            >
+
+              <td className="py-3">
+                {item.cliente_nome}
+              </td>
+
+              <td className="py-3">
+                {item.servico_nome}
+              </td>
+
+              <td className="py-3">
+                {item.barbeiro_nome}
+              </td>
+
+              <td className="py-3">
+                {new Date(item.dataHora)
+                  .toLocaleString("pt-BR")}
+              </td>
+
+            </tr>
+
+          ))}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
 
       {/* MODAL DELETE */}
       <Modal
@@ -782,6 +1122,7 @@ export default function Home() {
             }
             className="bg-white/10 hover:bg-white/20 px-5 py-2 rounded-xl transition"
           >
+          
             Cancelar
           </button>
 

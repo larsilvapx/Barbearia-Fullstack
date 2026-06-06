@@ -24,7 +24,7 @@ def gerar_relatorio_pdf(agendamentos):
             f"Cliente: {agendamento.cliente.nome} | "
             f"Barbeiro: {agendamento.barbeiro.nome} | "
             f"Serviço: {agendamento.servico.nome} | "
-            f"Data: {agendamento.dataHora}"
+            f"Data: {agendamento.data_hora}"
         )
 
         pdf.drawString(40, y, texto)

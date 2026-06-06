@@ -4,10 +4,12 @@ certifi==2026.4.22
 Django==5.2.13
 django-cors-headers==4.9.0
 djangorestframework==3.17.1
+djangorestframework_simplejwt==5.5.1
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
 idna==3.13
+PyJWT==2.13.0
 sqlparse==0.5.5
 typing_extensions==4.15.0
 tzdata==2026.2

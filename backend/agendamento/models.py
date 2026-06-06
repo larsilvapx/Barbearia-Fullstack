@@ -51,8 +51,6 @@ class Agendamento(models.Model):
         default='pendente'
     )
 
-    criado_em = models.DateTimeField(auto_now_add=True)        
-
 
     def __str__(self):
         return f"{self.cliente.nome} - {self.data_hora}" 
