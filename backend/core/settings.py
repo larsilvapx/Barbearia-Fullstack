@@ -28,9 +28,7 @@ SECRET_KEY = 'django-insecure-+x0h%p^i4o75!opu7gl+1676m_pw_-yz8*+5d_!8mc_ek=u*#6
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 
-ALLOWED_HOSTS = ["127.0.0.1",
-                 "localhost",
-                "https://barbearia-fullstack.onrender.com/",]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
