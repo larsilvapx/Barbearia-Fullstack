@@ -27,13 +27,10 @@ SECRET_KEY = 'django-insecure-+x0h%p^i4o75!opu7gl+1676m_pw_-yz8*+5d_!8mc_ek=u*#6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-CORS_ALLOWED_ORIGINS = [
-    "https://barbearia.vercel.app",
-]
 
 ALLOWED_HOSTS = ["127.0.0.1",
                  "localhost",
-                "barbearia-api.onrender.com",]
+                "https://barbearia-fullstack.onrender.com/",]
 
 
 # Application definition
