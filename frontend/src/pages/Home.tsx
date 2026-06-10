@@ -510,7 +510,7 @@ export default function Home() {
           <div className="md:hidden flex items-center justify-between mb-6">
 
             <h1 className="text-2xl font-bold">
-              💈 BarberPro
+            
             </h1>
 
             <button
@@ -533,12 +533,12 @@ export default function Home() {
             <div className="relative z-10">
 
               <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
-                💈 BarberPro
+            
               </h1>
 
-              <p className="text-lg text-gray-300">
+              <h3 className="text-lg text-gray-400">
                 Controle completo da sua barbearia.
-              </p>
+              </h3>
 
               <p className="text-sm text-gray-400 mt-2">
                 {dataAtual}

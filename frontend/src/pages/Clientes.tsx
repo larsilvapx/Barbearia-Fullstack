@@ -6,6 +6,7 @@ import Modal from "../components/Modal";
 type Cliente = {
   id: number;
   nome: string;
+  telefone?:string
 };
 
 export default function Clientes() {
@@ -178,6 +179,16 @@ export default function Clientes() {
             placeholder="Nome do cliente"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
+            className="flex-1 bg-black/30 border border-white/10 rounded-xl p-3 outline-none focus:border-green-500 transition"
+          />
+
+          <input
+            type="text"
+            placeholder="Telefone"
+            value={telefone}
+            onChange={(e) =>
+              setTelefone(e.target.value)
+            }
             className="flex-1 bg-black/30 border border-white/10 rounded-xl p-3 outline-none focus:border-green-500 transition"
           />
 

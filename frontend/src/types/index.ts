@@ -1,6 +1,7 @@
 export interface Cliente {
   id: number;
   nome: string;
+  telefone?:string
 }
 
 export interface Barbeiro {
