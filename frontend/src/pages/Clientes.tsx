@@ -6,7 +6,8 @@ import Modal from "../components/Modal";
 type Cliente = {
   id: number;
   nome: string;
-  telefone?:string
+  email: string;
+  telefone:string;
 };
 
 export default function Clientes() {
@@ -14,6 +15,10 @@ export default function Clientes() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
 
   const [nome, setNome] = useState("");
+
+  const [email, setEmail] = useState("");
+
+  const [telefone, setTelefone] = useState("");
 
   const [loading, setLoading] = useState(true);
 
@@ -27,7 +32,9 @@ export default function Clientes() {
 
   const [editForm, setEditForm] = useState({
     id: 0,
-    nome: ""
+    nome: "",
+    email: "",
+    telefone: ""
   });
 
   // CARREGAR
@@ -68,12 +75,16 @@ export default function Clientes() {
     try {
 
       const response = await api.post("clientes/", {
-        nome
+        nome,
+        email,
+        telefone
       });
 
       setClientes(prev => [...prev, response.data]);
 
       setNome("");
+      setEmail("");
+      setTelefone("");
 
       toast.success("Cliente cadastrado!");
 
@@ -116,7 +127,13 @@ export default function Clientes() {
   // EDIT
   const openEditModal = (cliente: Cliente) => {
 
-    setEditForm(cliente);
+    setEditForm({
+      id: cliente.id,
+      nome: cliente.nome,
+      email: cliente.email,
+      telefone: cliente.telefone || "",
+  
+    });
 
     setOpenEdit(true);
   };
@@ -179,6 +196,14 @@ export default function Clientes() {
             placeholder="Nome do cliente"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
+            className="flex-1 bg-black/30 border border-white/10 rounded-xl p-3 outline-none focus:border-green-500 transition"
+          />
+
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="flex-1 bg-black/30 border border-white/10 rounded-xl p-3 outline-none focus:border-green-500 transition"
           />
 
@@ -247,7 +272,7 @@ export default function Clientes() {
                 </h3>
 
                 <p className="text-gray-400 text-sm">
-                  Cliente cadastrado no sistema
+                  {cliente.telefone || "Telefone não informado"}
                 </p>
 
               </div>
@@ -332,6 +357,19 @@ export default function Clientes() {
             })
           }
           className="w-full bg-black/30 border border-white/10 rounded-xl p-3 outline-none focus:border-green-500 transition"
+        />
+
+        <input
+          type="text"
+          value={editForm.telefone}
+          onChange={(e) =>
+            setEditForm({
+              ...editForm,
+              telefone: e.target.value
+            })
+          }
+          placeholder="Telefone"
+          className="w-full bg-black/30 border border-white/10 rounded-xl p-3 outline-none focus:border-green-500 transition mt-4"
         />
 
         <div className="flex justify-end gap-4 mt-8">

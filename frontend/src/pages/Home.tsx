@@ -41,7 +41,7 @@ export default function Home() {
 
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
 
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   // FILTROS
   const [search, setSearch] = useState("");
@@ -51,8 +51,7 @@ export default function Home() {
   // DELETE
   const [openDelete, setOpenDelete] = useState(false);
 
-  const [selectedId, setSelectedId] =
-    useState<number | null>(null);
+  
 
   // EDIT
   const [openEdit, setOpenEdit] = useState(false);
@@ -91,12 +90,15 @@ export default function Home() {
   };
 
   // DELETE
+  /*
+  
   const openDeleteModal = (id: number) => {
 
     setSelectedId(id);
 
     setOpenDelete(true);
   };
+  
 
   const handleDelete = async () => {
 
@@ -119,8 +121,11 @@ export default function Home() {
       toast.error("Erro ao excluir!");
     }
   };
-
+  */
+  
+  
   // EDITAR
+  /*
   const openEditModal = (a: Agendamento) => {
 
     setEditForm({
@@ -129,12 +134,14 @@ export default function Home() {
       barbeiro_nome: a.barbeiro_nome,
       servico_nome: a.servico_nome,
       dataHora: a.dataHora
-        ? a.dataHora.slice(0, 16)
+        
         : ""
     });
+    
 
     setOpenEdit(true);
   };
+  */
 
   const handleUpdate = async () => {
 
@@ -1036,12 +1043,8 @@ export default function Home() {
             Cancelar
           </button>
 
-          <button
-            onClick={handleDelete}
-            className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl transition"
-          >
-            Excluir
-          </button>
+
+          
 
         </div>
 
