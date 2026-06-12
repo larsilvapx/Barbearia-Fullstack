@@ -1,155 +1,113 @@
-💈 BarberPro
+# Francis Farmer Barber - Sistema de Agendamento para Barbearia
 
-Sistema completo de gerenciamento para barbearias desenvolvido com React + TypeScript no frontend e Django REST Framework no backend.
+## Sobre o Projeto
 
-O projeto permite controlar clientes, barbeiros, serviços e agendamentos, além de possuir dashboard financeiro, calendário inteligente e interface moderna responsiva.
+O Francis Farmer Barber é uma aplicação Full Stack desenvolvida para gerenciamento de agendamentos em uma barbearia.
 
-🚀 Tecnologias Utilizadas
+O sistema permite o cadastro e gerenciamento de clientes, barbeiros, serviços e agendamentos, oferecendo uma interface moderna e responsiva para facilitar o controle dos atendimentos.
 
-Frontend
+O projeto foi desenvolvido como parte do meu processo de transição de carreira para a área de Desenvolvimento de Software e Dados, aplicando conceitos de desenvolvimento web, APIs REST, bancos de dados relacionais e deploy em produção.
 
-React
-TypeScript
-Vite
-TailwindCSS
-React Router DOM
-Axios
-React Hot Toast
-FullCalendar
-Recharts
-Lucide React
+---
 
+## Tecnologias Utilizadas
 
-Backend
+### Frontend
 
-Python
-Django
-Django REST Framework
-Simple JWT
-SQLite
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* Axios
+* React Router DOM
+* Recharts
 
+### Backend
 
-✨ Funcionalidades Implementadas
+* Python
+* Django
+* Django REST Framework
+* Simple JWT
+* CORS Headers
+* WhiteNoise
 
-🔐 Autenticação
-Login com JWT
-Proteção de rotas
-Logout seguro
+### Banco de Dados
 
+* PostgreSQL
 
-👥 Clientes
-Cadastro de clientes
-Edição de clientes
-Exclusão de clientes
-Listagem dinâmica
-Busca em tempo real
+### Deploy
 
+* Render
 
-👨‍💼 Barbeiros
-Cadastro de barbeiros
-Percentual de comissão
-Edição e exclusão
-Integração financeira
+---
 
+## Funcionalidades
 
-✂️ Serviços
-Cadastro de serviços
-Valor dos serviços
-Atualização dinâmica
-Remoção de serviços
+### Clientes
 
-📅 Agendamentos
-Criação de agendamentos
-Seleção de cliente
-Seleção de barbeiro
-Seleção de serviço
-Seleção de horário
-Controle de horários disponíveis
-Exclusão de agendamentos
-Edição de agendamentos
+* Cadastro de clientes
+* Listagem de clientes
+* Edição de clientes
+* Exclusão de clientes
 
+### Barbeiros
 
-🗓️ Calendário Inteligente
-Visualização mensal
-Visualização semanal
-Visualização diária
-Agenda por barbeiro
-Filtro individual de profissionais
-Eventos coloridos
-Clique em eventos
-Responsividade mobile
+* Cadastro de barbeiros
+* Listagem de barbeiros
+* Edição de barbeiros
+* Exclusão de barbeiros
 
+### Serviços
 
-📊 Dashboard Financeiro
-Total de agendamentos
-Agendamentos do dia
-Próximos atendimentos
-Faturamento total
-Controle de comissões
-Gráfico de faturamento por serviço
-Serviços mais vendidos
-Busca dinâmica
-Filtros inteligentes
+* Cadastro de serviços
+* Listagem de serviços
+* Edição de serviços
+* Exclusão de serviços
 
+### Agendamentos
 
-📱 Responsividade
-O sistema foi totalmente adaptado para:
+* Cadastro de agendamentos
+* Visualização dos agendamentos
+* Atualização de agendamentos
+* Exclusão de agendamentos
+* Integração entre clientes, barbeiros e serviços
 
-Desktop
-Tablet
-Smartphones
+### Segurança
 
-Incluindo:
+* Autenticação JWT
+* Proteção de rotas
+* Controle de acesso por token
 
-Sidebar mobile
-Menu hamburguer
-Layout adaptativo
-Gráficos responsivos
-Cards responsivos
+### Relatórios
 
-🎨 Interface
-Design moderno
-Tema dark profissional
-Animações suaves
-Feedback visual
-Modais customizados
-UX otimizada
+* Geração de relatório PDF dos agendamentos
 
-🧠 Estrutura Inteligente do Sistema
-Backend
+---
 
-O backend foi estruturado utilizando:
+## Estrutura do Projeto
 
-Models
-Serializers
-ViewSets
-Rotas REST
-JWT Authentication
-Frontend
-
-O frontend utiliza:
-
-Componentização
-Hooks
-Tipagem forte com TypeScript
-Organização por páginas
-Serviços centralizados de API
-
-📂 Estrutura do Projeto
 frontend/
- ├── src/
- │   ├── pages/
- │   ├── components/
- │   ├── services/
- │   ├── routes/
- │   └── types/
+├── src/
+├── components/
+├── pages/
+├── services/
+└── types/
 
 backend/
- ├── agendamento/
- ├── barberpro/
- ├── manage.py
-⚙️ Como Rodar o Projeto
-Backend
+├── agendamento/
+├── core/
+├── serializers/
+├── models/
+├── views/
+└── urls/
+
+---
+
+## Como Executar Localmente
+
+### Backend
+
+```bash
 cd backend
 
 python -m venv venv
@@ -161,57 +119,36 @@ pip install -r requirements.txt
 python manage.py migrate
 
 python manage.py runserver
+```
 
-Servidor:
+### Frontend
 
-http://127.0.0.1:8000
-Frontend
+```bash
 cd frontend
 
 npm install
 
 npm run dev
+```
 
-Aplicação:
+---
 
-http://localhost:5173
-🔑 Credenciais JWT
+## Melhorias Futuras
 
-Endpoint:
+* Dashboard administrativo
+* Controle de horários disponíveis em tempo real
+* Notificações de agendamento
+* Integração com WhatsApp
+* Histórico de atendimentos
+* Painel financeiro
+* Deploy automatizado com CI/CD
 
-/api/token/
+---
 
+## Autor
 
-📈 Próximos Upgrades
-🟣 Nível Profissional
-Controle financeiro avançado
-Relatórios PDF
-Dashboard administrativo
-Multiusuário
-Níveis de acesso
-Confirmação por WhatsApp
-Notificações automáticas
-Deploy em produção
-Integração com IA
-PWA
-Tema customizável
+Luciano Rodrigues
 
-👨‍💻 Desenvolvedor
+Estudante de Análise e Desenvolvimento de Sistemas.
 
-Projeto desenvolvido por Luciano Rodrigues com foco em:
-
-Backend Python
-Frontend React
-APIs REST
-UX/UI moderna
-Sistemas profissionais completos
-
-
-📌 Status do Projeto
-
-🚧 Em desenvolvimento contínuo
-✅ Estrutura principal finalizada
-✅ Dashboard profissional implementado
-✅ Calendário inteligente implementado
-✅ Responsividade mobile implementada
-✅ Controle financeiro implementado
+Atualmente em transição de carreira para Desenvolvimento de Software e Dados, buscando oportunidades para aprendizado, crescimento profissional e contribuição em projetos de tecnologia.
