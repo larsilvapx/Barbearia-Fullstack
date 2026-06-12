@@ -32,10 +32,12 @@ ALLOWED_HOSTS = [
         "127.0.0.1",
         "localhost",
         "barbearia-fullstack.onrender.com",
+        "barbearia-fullstack-1.onrender.com",
                 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite local
+    "http://localhost:5173",
+    "https://barbearia-fullstack-1.onrender.com", # Vite local
 ]
 
 CORS_ALLOW_CREDENTIALS = True
