@@ -37,9 +37,19 @@ export default function NovoAgendamento() {
 
 useEffect(() => {
   if (form.barbeiro && form.data) {
-    api.get(`agendamentos/horarios_disponiveis/?barbeiro=${form.barbeiro}&data=${form.data}`)
-      .then(res => setHorarios(res.data))
-      .catch(err => console.error("Erro horários:", err));
+
+    console.log("Buscando horários...");
+
+    api.get(
+      `agendamentos/horarios_disponiveis/?barbeiro=${form.barbeiro}&data=${form.data}`
+    )
+    .then(res => {
+      console.log("HORÁRIOS RECEBIDOS:", res.data);
+      setHorarios(res.data);
+    })
+    .catch(err => {
+      console.error("Erro horários:", err);
+    });
   }
 }, [form.barbeiro, form.data]);
 

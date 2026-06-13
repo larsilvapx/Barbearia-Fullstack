@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.response import Response
 from django.http import HttpResponse
 from reportlab.platypus import (
     SimpleDocTemplate,
@@ -50,6 +51,22 @@ class AgendamentoViewSet(viewsets.ModelViewSet):
     queryset = Agendamento.objects.all()
     serializer_class = AgendamentoSerializer
 
+    @action(detail=False, methods=["get"])
+    def horarios_disponiveis(self, request):
+        
+        horarios = [
+            "08:00",
+            "09:00",
+            "10:00",
+            "11:00",
+            "14:00",
+            "15:00",
+            "16:00",
+            "17:00",
+        ]
+
+        return Response(horarios)
+    
     @action(detail=False, methods=["get"])
     def relatorio_pdf(self, request):
 
